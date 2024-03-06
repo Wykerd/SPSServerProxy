@@ -35,7 +35,9 @@ public class ServerSpawnPaintingPacketBehaviour implements Behaviour<Packet> {
         UUID uuid = serverSpawnPaintingPacket.getUUID();
 
         if (!EmulatedClientConnection.isPlayer(entityId)){
-            new EntityTracker(x, y, z, entityId, uuid);
+            if (EntityTracker.getEntityTrackerByEntityId(entityId) == null) {
+                new EntityTracker(x, y, z, entityId, uuid);
+            }
         }
 
 //        Logger.log(this, Logger.Level.DEBUG, new String[]{"Entity", "spawnEntity", "behaviour"}, "Spawn entity: " + entityId + " :: Painting (" + serverSpawnPaintingPacket.getPaintingType().name() + ")");

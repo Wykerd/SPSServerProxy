@@ -34,7 +34,9 @@ public class ServerSpawnExpOrbPacketBehaviour implements Behaviour<Packet> {
 //        UUID uuid = serverSpawnExpOrbPacket.getUUID();
 
         if (!EmulatedClientConnection.isPlayer(entityId)){
-            new EntityTracker(x, y, z, entityId, null);
+            if (EntityTracker.getEntityTrackerByEntityId(entityId) == null) {
+                new EntityTracker(x, y, z, entityId, null);
+            }
         }
 
 //        Logger.log(this, Logger.Level.DEBUG, new String[]{"Entity", "spawnEntity", "behaviour"}, "Spawn entity: " + entityId + " :: Experience (" + serverSpawnExpOrbPacket.getExp() + ")");

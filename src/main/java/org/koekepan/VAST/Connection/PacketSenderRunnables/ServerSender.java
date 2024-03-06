@@ -5,8 +5,6 @@ import org.koekepan.VAST.Connection.VastConnection;
 import org.koekepan.VAST.Packet.PacketWrapper;
 import org.koekepan.VAST.Packet.SPSPacket;
 
-import static org.koekepan.VAST.Connection.ClientConnectedInstance.clientInstances_PacketSenders;
-
 public class ServerSender implements Runnable{
 
     private PacketSender packetSender;

@@ -36,7 +36,9 @@ public class ServerSpawnObjectPacketBehaviour implements Behaviour<Packet> {
         UUID uuid = serverSpawnObjectPacket.getUUID();
 
         if (!EmulatedClientConnection.isPlayer(entityId)){
-            new EntityTracker(x, y, z, entityId, uuid);
+            if (EntityTracker.getEntityTrackerByEntityId(entityId) == null) {
+                new EntityTracker(x, y, z, entityId, uuid);
+            }
         }
 
         SPSPacket spsPacket;

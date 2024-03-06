@@ -10,7 +10,7 @@ import org.koekepan.VAST.Packet.SPSPacket;
 public class ServerJoinGamePacketBehaviour implements Behaviour<Packet> {
 		
 	private EmulatedClientConnection emulatedClientConnection;
-	private IServerSession serverSession;
+//	private IServerSession serverSession;
 	
 	@SuppressWarnings("unused")
 	private ServerJoinGamePacketBehaviour() {}

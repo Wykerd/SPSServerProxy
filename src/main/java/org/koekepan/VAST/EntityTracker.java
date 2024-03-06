@@ -19,14 +19,6 @@ public class EntityTracker {
     // Constructor to initialize all fields
     public EntityTracker(double x, double y, double z, int entityId, UUID uuid) {
         // if not an enity already based on enityId and entityTrackerMapByEntityId
-        EntityTracker existingEntityTracker = entityTrackerMapByEntityId.get(entityId);
-
-        if (existingEntityTracker != null) {
-            existingEntityTracker.setX(x);
-            existingEntityTracker.setY(y);
-            existingEntityTracker.setZ(z);
-            return;
-        }
 
         this.x = x;
         this.y = y;

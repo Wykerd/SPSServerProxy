@@ -36,7 +36,9 @@ public class ServerSpawnGlobalEntityPacketBehaviour implements Behaviour<Packet>
         UUID uuid = null;
 
         if (!EmulatedClientConnection.isPlayer(entityId)){
-            new EntityTracker(x, y, z, entityId, uuid);
+            if (EntityTracker.getEntityTrackerByEntityId(entityId) == null) {
+                new EntityTracker(x, y, z, entityId, uuid);
+            }
         }
 
 //        Logger.log(this, Logger.Level.INFO, new String[]{"Entity", "spawnEntity", "behaviour"}, "Spawn entity: " + entityId + " :: " + serverSpawnGlobalEntityPacket.getType().toString());
