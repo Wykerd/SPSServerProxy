@@ -1,0 +1,84 @@
+package org.koekepan;
+
+import com.github.steveice10.mc.protocol.MinecraftProtocol;
+import com.github.steveice10.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
+import com.github.steveice10.packetlib.Client;
+import com.github.steveice10.packetlib.Session;
+import com.github.steveice10.packetlib.event.session.SessionAdapter;
+import com.github.steveice10.packetlib.packet.Packet;
+import com.github.steveice10.packetlib.tcp.TcpSessionFactory;
+import org.koekepan.VAST.Connection.EmulatedClientConnection;
+import org.koekepan.VAST.Connection.PacketSender;
+import org.koekepan.VAST.Connection.VastConnection;
+import org.koekepan.VAST.Packet.PacketHandler;
+import org.koekepan.VAST.Packet.PacketWrapper;
+
+import java.util.HashMap;
+
+public class App
+{
+    static AppConfig config = new AppConfig();
+//    config.loadProperties();
+
+    // This is the server ip/port that the proxy will listen on (aka the server that is emulated)
+    static String minecraftHost = config.getHost();
+    static int minecraftPort = config.getPort();
+
+    // This is the VAST_COM ip/port that the proxy will connect to (aka the sps client)
+    static String vastHost = config.getVastHost();
+    static int vastPort = config.getVastPort();
+
+    private static VastConnection vastConnection;
+    public static HashMap<Session, EmulatedClientConnection> emulatedClientInstances = new HashMap<Session, EmulatedClientConnection>();
+
+//    private static final PacketHandler packetHandler = new PacketHandler();
+//    public static PacketSender packetSender = new PacketSender();
+
+    public App() {
+        // 0. Initialize the packet sender
+//        PacketSender packetSender = new PacketSender();
+
+
+        // 2. Create VAST_COM connection
+        // For each client that connects to the server, create a emulatedClientConnection and add to HASHMAP clientInstances
+
+        vastConnection = new VastConnection(vastHost, vastPort);
+        vastConnection.connect();
+
+        connectProxyPlayer();
+
+    }
+
+    public static void main(String[] args )
+    {
+
+        System.out.println( "Hello World! We are starting the SPSClientProxy!");
+        System.out.println("VAST_COM Host: " + vastHost + " Port: " + vastPort);
+        System.out.println("Minecraft Server Host: " + minecraftHost + " Port: " + minecraftPort);
+
+        new App();
+    }
+
+    public static VastConnection getVastConnection() {
+        return vastConnection;
+    }
+
+
+    private static void connectProxyPlayer() {
+        // 1. Create a Fake Player and connect to server
+        MinecraftProtocol protocol = new MinecraftProtocol("ProxyListener2");
+        EmulatedClientConnection emulatedClientConnection = new EmulatedClientConnection(minecraftHost, minecraftPort, "ProxyListener2");
+        emulatedClientConnection.setPacketHandler(new PacketHandler(emulatedClientConnection));
+
+        emulatedClientConnection.connect();
+    }
+
+    public static void connectNewEmulatedClient(String username) {
+        EmulatedClientConnection emulatedClientConnection = new EmulatedClientConnection(minecraftHost, minecraftPort, username);
+        emulatedClientConnection.setPacketHandler(new PacketHandler(emulatedClientConnection));
+        emulatedClientInstances.put(emulatedClientConnection.getSession(), emulatedClientConnection);
+
+        emulatedClientConnection.connect();
+    }
+
+}
