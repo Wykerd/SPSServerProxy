@@ -111,7 +111,7 @@ public class PacketWrapper {
         } else {
             new Thread(() -> {
                 try {
-                    sleep(50);
+                    sleep(10);
 //                    setProcessed(packet, isProcessed);
                     PacketWrapper packetWrapper1 = packetWrapperMap.get(packet);
                     if (packetWrapper1 != null) {
