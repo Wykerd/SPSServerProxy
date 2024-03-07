@@ -39,9 +39,15 @@ public class ServerEntityStatusPacketBehaviour implements Behaviour<Packet> {
             z = EntityTracker.getZByEntityId(entityId);
         } else {
             System.out.println("ServerEntityStatusPacketBehaviour::process => (ERROR) No entity found with Entity Id: " + entityId);
-            emulatedClientConnection.getPacketSender().removePacket(packet);
-//            throw new RuntimeException("No entity found with Entity Id: " + entityId);
-//            Logger.log(this, Logger.Level.ERROR, new String[]{"behaviour", "entityMovement"}, "No entity found with Entity Id: " + entityId);
+
+            SPSPacket spsPacket;
+            if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
+                spsPacket = new SPSPacket(packet, "clientBound", 100, 100, 10000, "clientBound");
+            } else {
+                spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) 100, (int) 100, 10000, emulatedClientConnection.getUsername());
+            }
+            PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
+            PacketWrapper.setProcessed(packet, true);
             return;
         }
 

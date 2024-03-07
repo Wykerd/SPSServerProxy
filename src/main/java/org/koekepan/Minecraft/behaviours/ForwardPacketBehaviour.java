@@ -37,6 +37,11 @@ public class ForwardPacketBehaviour implements Behaviour<Packet> {
 
 				SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
 				PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
+			} else {
+				if (packet.getClass().getSimpleName().equals("ServerKeepAlivePacket")){
+					emulatedClientConnection.getPacketSender().removePacket(packet);
+					return;
+				}
 			}
 		}
 
