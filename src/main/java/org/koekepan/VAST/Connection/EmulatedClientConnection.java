@@ -104,8 +104,13 @@ public class EmulatedClientConnection {
     }
 
     public void disconnect() {
-        this.session.disconnect("Disconnected");
         this.connected = false;
+        this.packetSender.stop();
+        this.session.disconnect("Disconnected");
+
+        playerEntityIds.remove(entityID);
+        emulatedClientInstances.remove(session);
+        App.emulatedClientInstancesByUsername.remove(username);
     }
 
     public boolean isConnected() {

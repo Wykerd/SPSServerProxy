@@ -153,8 +153,12 @@ public class VastConnection {
 
                         if (establishConnectionPacket.establishConnection()) {
                             App.connectNewEmulatedClient(establishConnectionPacket.getUsername());
+//                            packetWrapperMap.remove(packet.packet);
+//                            return;
                         } else {
-//                            App.disconnectEmulatedClient(establishConnectionPacket.getUsername());
+                            App.emulatedClientInstancesByUsername.get(username).disconnect();
+//                            packetWrapperMap.remove(packet.packet);
+//                            return;
                         }
 
                     }
