@@ -3,6 +3,7 @@ package org.koekepan.VAST.Connection;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.packet.Packet;
 //import org.koekepan.Performance.PacketCapture;
+import org.koekepan.Performance.PacketCapture;
 import org.koekepan.VAST.Connection.PacketSenderRunnables.ClientSender;
 import org.koekepan.VAST.Connection.PacketSenderRunnables.ServerSender;
 import org.koekepan.VAST.Packet.PacketWrapper;
@@ -84,15 +85,17 @@ public class PacketSender { // This is the packet sender, it sends packets to th
     public void addClientBoundPacket(Packet packet) {
         PacketWrapper packetWrapper = PacketWrapper.getPacketWrapper(packet);
         packetWrapper.clientBound = true;
-        packetWrapper.unique_id = "CB" + UUID.randomUUID().toString().substring(0, 4) + (queueNumberClientboundLast+1);
+
 //        packetWrapperMap.put(packet, packetWrapper);
 
 //        clientInstances_PacketSenders.get(this).getPacketHandler().addPacket(packetWrapper);
 
 //        System.out.println("PacketSender.addServerboundPacket: " + packet.getClass().getSimpleName());
-        packetWrapper.queueNumber = ++queueNumberClientboundLast;
-        packetWrapper.unique_id = "SB" + UUID.randomUUID().toString().substring(0, 4) + queueNumberClientboundLast;
-        clientboundPacketQueue.put(queueNumberClientboundLast, packetWrapper);
+        clientboundPacketQueue.put(++queueNumberClientboundLast, packetWrapper);
+        packetWrapper.queueNumber = queueNumberClientboundLast;
+        packetWrapper.unique_id = "CB" + UUID.randomUUID().toString().substring(0, 4) + queueNumberClientboundLast;
+        PacketCapture.log(packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id, PacketCapture.LogCategory.CLIENTBOUND_IN);
+
 //        PacketCapture.log(packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id, PacketCapture.LogCategory.SERVERBOUND_IN);
     }
 
@@ -104,7 +107,14 @@ public class PacketSender { // This is the packet sender, it sends packets to th
 //        return clientboundPacketQueue.containsKey(PacketWrapper.get_QueueNumber(packet));
 //    }
 
+    public void setServerSenderUsername(String username) { // TODO: Remove!
+        clientSender.setUsername(username);
+    }
+
     public void removePacket(Packet packet) {
+
+        PacketCapture.log(packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet), PacketCapture.LogCategory.DELETED_PACKETS);
+
         PacketWrapper packetWrapper = packetWrapperMap.get(packet);
         if (packetWrapper != null) {
             if (packetWrapper.clientBound) {

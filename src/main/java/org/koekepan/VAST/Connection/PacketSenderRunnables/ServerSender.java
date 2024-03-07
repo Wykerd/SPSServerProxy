@@ -10,9 +10,15 @@ public class ServerSender implements Runnable{
     private PacketSender packetSender;
     private VastConnection vastConnection;
 
+    private String username;
+
     public ServerSender(PacketSender packetSender, VastConnection vastConnection) {
         this.packetSender = packetSender;
         this.vastConnection = vastConnection;
+    }
+
+    public void setUsername(String username) { // TODO: remove
+        this.username = username;
     }
 
     private int queueNumberClientBound = 0;
@@ -23,6 +29,9 @@ public class ServerSender implements Runnable{
         try {
             while (!packetSender.clientboundPacketQueue.isEmpty()) {
                 try {
+//                    if (!(username.equals("ProxyListener2"))){
+//                        System.out.println("<" + username + "> ServerSender.run: packetSender.clientboundPacketQueue.size() = " + packetSender.clientboundPacketQueue.size() + " and queueNumberClientBound = " + queueNumberClientBound + " and queueNumberClientboundLast = " + packetSender.queueNumberClientboundLast);
+//                    }
                     if (packetSender.clientboundPacketQueue.containsKey(queueNumberClientBound)) {
                         PacketWrapper wrapper = null;
                         try {
@@ -62,7 +71,7 @@ public class ServerSender implements Runnable{
 
                     // Handle timeout for both queues
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime - timeAdded > 50) { // TODO: Change back to 100 when problem found (could be 50)
+                    if (currentTime - timeAdded > 100) { // TODO: Change back to 100 when problem found (could be 50)
                         if (packetSender.clientboundPacketQueue.containsKey(queueNumberClientBound)) {
                             PacketWrapper wrapper = null;
                             try {
@@ -73,14 +82,22 @@ public class ServerSender implements Runnable{
 
                             if (wrapper != null) {
                                 try {
-                                    System.out.println("ServerSender.run: <TIMED OUT> (clientbound) Wrapper is: " + wrapper.getPacket().getClass().getSimpleName() + " and isProcessed: " + wrapper.isProcessed);
+//                                    if (!(username.equals("ProxyListener2"))){
+                                        System.out.println("ServerSender.run: <TIMED OUT> (clientbound) Wrapper is: " + wrapper.getPacket().getClass().getSimpleName() + " and isProcessed: " + wrapper.isProcessed);
+//                                    }
                                     packetSender.removePacket(wrapper.getPacket());
                                     queueNumberClientBound++;
                                     timeAdded = currentTime; // Reset time after handling timeouts
                                 } catch (Exception e) {
                                     System.out.println("Error removing packet: " + e.getMessage());
                                 }
+                            } else {
+                                System.out.println("ServerSender.run: <TIMED OUT> (clientbound) Wrapper is null");
+//                                queueNumberClientBound++;
+//                                timeAdded = currentTime; // Reset time after handling timeouts
                             }
+                        } else {
+//                            timeAdded = currentTime; // Reset time after handling timeouts
                         }
                     }
 

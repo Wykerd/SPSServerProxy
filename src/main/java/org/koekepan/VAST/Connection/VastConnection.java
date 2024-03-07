@@ -17,6 +17,7 @@ import org.koekepan.App;
 //import org.koekepan.Minecraft.ChunkPosition;
 //import org.koekepan.Performance.PacketCapture;
 import org.koekepan.Minecraft.ChunkPosition;
+import org.koekepan.Performance.PacketCapture;
 import org.koekepan.VAST.CustomPackets.EstablishConnectionPacket;
 import org.koekepan.VAST.Packet.PacketWrapper;
 import org.koekepan.VAST.Packet.SPSPacket;
@@ -141,6 +142,8 @@ public class VastConnection {
                 packetWrapper.clientBound = false;
                 packetWrapperMap.put(packet.packet, packetWrapper);
 
+                PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + unique_id, PacketCapture.LogCategory.SERVERBOUND_IN);
+
                 if (packet.channel.equals("serverBound")) {
 
                     if (packet.packet instanceof EstablishConnectionPacket){
@@ -225,7 +228,7 @@ public class VastConnection {
 
     public void publish(SPSPacket packet) { // sends to vast matcher as client
 
-        System.out.println("Connection <"+uuid+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
+//        System.out.println("Connection <"+uuid+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
 
         //convert to JSON
         Gson gson = new Gson();
@@ -240,6 +243,9 @@ public class VastConnection {
 //        temp_pubcounter += 1;
 //        Logger.log(this, Logger.Level.DEBUG, new String[]{"counter", "clientPub"},"Amount of packets sent: " + temp_pubcounter + ": " + packet.packet.getClass().getSimpleName());
 //        PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet.packet), PacketCapture.LogCategory.SERVERBOUND_OUT);
+
+        PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet.packet), PacketCapture.LogCategory.CLIENTBOUND_OUT);
+
         socket.emit("publish", connectionID, packet.username + "&" + PacketWrapper.getPacketWrapper(packet.packet).unique_id, // + PacketSender.get_UniqueId(packet.packet),
                 x, y, radius, json, packet.channel); // TODO: Check the packet.username and if it is necessary
     }
