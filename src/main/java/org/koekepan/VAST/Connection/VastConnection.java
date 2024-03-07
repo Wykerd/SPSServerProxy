@@ -131,7 +131,7 @@ public class VastConnection {
             public void call(Object... data) {
                 final SPSPacket packet = receivePublication(data);
 
-                System.out.println("Received packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
+//                System.out.println("Received packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
 
                 String username = packet.username.split("&")[0];
                 String unique_id = packet.username.split("&")[1];
@@ -155,6 +155,15 @@ public class VastConnection {
                         }
 
                     }
+
+                    // Can get connected client based on username of packet, I don't like this, I want to use session if possible
+                    if (App.emulatedClientInstancesByUsername.containsKey(username)) {
+                        App.emulatedClientInstancesByUsername.get(username).getPacketSender().addServerBoundPacket(packet.packet);
+                        App.emulatedClientInstancesByUsername.get(username).getPacketHandler().addPacket(packetWrapper);
+                    } else {
+                        System.out.println("VastConnection.java => (ERROR) Received packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
+                    }
+//                    packetWrapperMap.remove(packet.packet);
                     // add to serverBoundQueue
                     // in the add, also add to packethandler
                 } else {

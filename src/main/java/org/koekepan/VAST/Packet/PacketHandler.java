@@ -17,17 +17,17 @@ public class PacketHandler {
 
 
     public PacketHandler(EmulatedClientConnection clientInstance) {
-//        this.behaviourHandler = new BehaviourHandler<Packet>();
-//        ClientBoundPacketBehaviours clientBoundPacketBehaviours = new ClientBoundPacketBehaviours(clientInstance);
-//        clientBoundPacketBehaviours.registerForwardingBehaviour();
+        this.behaviourHandler = new BehaviourHandler<Packet>();
+        ClientBoundPacketBehaviours clientBoundPacketBehaviours = new ClientBoundPacketBehaviours(clientInstance);
+        clientBoundPacketBehaviours.registerForwardingBehaviour();
 
         ServerBoundPacketBehaviours serverBoundPacketBehaviours = new ServerBoundPacketBehaviours(clientInstance);
         serverBoundPacketBehaviours.registerForwardingBehaviour();
 
         //Merge the behaviours
-//        BehaviourHandler<Packet> behaviourHandler = BehaviourHandler.mergeBehaviourHandlers(clientBoundPacketBehaviours, serverBoundPacketBehaviours);
+        BehaviourHandler<Packet> behaviourHandler = BehaviourHandler.mergeBehaviourHandlers(clientBoundPacketBehaviours, serverBoundPacketBehaviours);
 
-        this.setBehaviours(serverBoundPacketBehaviours);
+        this.setBehaviours(behaviourHandler);
     }
 
     public void addPacket(PacketWrapper packetWrapper) {

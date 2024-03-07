@@ -41,7 +41,7 @@ public class EmulatedClientConnection {
         this.connected = false;
 
         this.packetSender.setClientSession(this.session);
-        this.packetSender.startServerSender();
+        this.packetSender.startClientSender();
 
         this.session.addListener(new SessionAdapter() {
             @Override
@@ -49,12 +49,14 @@ public class EmulatedClientConnection {
 
                 PacketWrapper packetWrapper = new PacketWrapper( (Packet) event.getPacket() );
 //                packetWrapper.setPlayerSpecific(username);
-                packetWrapper.clientBound = false;
+                packetWrapper.clientBound = true;
 
                 PacketWrapper.packetWrapperMap.put(event.getPacket(), packetWrapper);
 
-                packetHandler.addPacket(event.getPacket());
-                packetSender.addServerBoundPacket(event.getPacket());
+//                System.out.println("<" + username + "> Received packet from server: " + event.getPacket().getClass().getSimpleName());
+
+                packetHandler.addPacket(packetWrapper);
+                packetSender.addClientBoundPacket(event.getPacket());
             }
 
             @Override

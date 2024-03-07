@@ -44,7 +44,7 @@ public class ServerBoundPacketBehaviours extends BehaviourHandler<Packet> {
 	private EmulatedClientConnection emulatedClientConnection;
 	private ForwardPacketBehaviour serverForwarder;
 
-	public ServerBoundPacketBehaviours(EmulatedClientConnection clientInstance) {
+	public ServerBoundPacketBehaviours(EmulatedClientConnection emulatedClientConnection) {
 		this.emulatedClientConnection = emulatedClientConnection;
 	}
 	

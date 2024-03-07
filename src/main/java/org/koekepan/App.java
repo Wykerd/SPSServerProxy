@@ -30,6 +30,7 @@ public class App
 
     private static VastConnection vastConnection;
     public static HashMap<Session, EmulatedClientConnection> emulatedClientInstances = new HashMap<Session, EmulatedClientConnection>();
+    public static HashMap<String, EmulatedClientConnection> emulatedClientInstancesByUsername = new HashMap<String, EmulatedClientConnection>();
 
 //    private static final PacketHandler packetHandler = new PacketHandler();
 //    public static PacketSender packetSender = new PacketSender();
@@ -76,7 +77,11 @@ public class App
     public static void connectNewEmulatedClient(String username) {
         EmulatedClientConnection emulatedClientConnection = new EmulatedClientConnection(minecraftHost, minecraftPort, username);
         emulatedClientConnection.setPacketHandler(new PacketHandler(emulatedClientConnection));
+
+        emulatedClientConnection.getPacketSender().startServerSender();
+
         emulatedClientInstances.put(emulatedClientConnection.getSession(), emulatedClientConnection);
+        emulatedClientInstancesByUsername.put(username, emulatedClientConnection);
 
         emulatedClientConnection.connect();
     }

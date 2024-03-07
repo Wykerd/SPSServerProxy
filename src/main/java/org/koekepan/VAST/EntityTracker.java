@@ -35,7 +35,7 @@ public class EntityTracker {
 
     public static void removeEntityByEntityId(int entityId) {
         entityTrackerMapByEntityId.remove(entityId);
-    }
+    } // TODO: Never used, needs to be implemented
 
     public static double getXByEntityId(int entityId) {
         EntityTracker et = entityTrackerMapByEntityId.get(entityId);

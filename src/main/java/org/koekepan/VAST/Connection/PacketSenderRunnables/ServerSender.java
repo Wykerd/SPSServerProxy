@@ -44,6 +44,7 @@ public class ServerSender implements Runnable{
                                 vastConnection.publish(spsPacket2);
                             } catch (Exception e) {
                                 System.out.println("Error publishing packet: <" + wrapper.getPacket().getClass().getSimpleName() + ">: " + e.getMessage());
+                                packetSender.removePacket(wrapper.getPacket());
                             }
                             try {
                                 packetSender.removePacket(wrapper.getPacket());
