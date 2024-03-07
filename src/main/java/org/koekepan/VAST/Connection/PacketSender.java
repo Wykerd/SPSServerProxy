@@ -84,6 +84,7 @@ public class PacketSender { // This is the packet sender, it sends packets to th
     public void addClientBoundPacket(Packet packet) {
         PacketWrapper packetWrapper = PacketWrapper.getPacketWrapper(packet);
         packetWrapper.clientBound = true;
+        packetWrapper.unique_id = "CB" + UUID.randomUUID().toString().substring(0, 4) + (queueNumberClientboundLast+1);
 //        packetWrapperMap.put(packet, packetWrapper);
 
 //        clientInstances_PacketSenders.get(this).getPacketHandler().addPacket(packetWrapper);

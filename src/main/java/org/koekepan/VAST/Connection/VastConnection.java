@@ -225,7 +225,7 @@ public class VastConnection {
 
     public void publish(SPSPacket packet) { // sends to vast matcher as client
 
-//        System.out.println("Connection <"+uuid+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
+        System.out.println("Connection <"+uuid+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
 
         //convert to JSON
         Gson gson = new Gson();
@@ -240,7 +240,7 @@ public class VastConnection {
 //        temp_pubcounter += 1;
 //        Logger.log(this, Logger.Level.DEBUG, new String[]{"counter", "clientPub"},"Amount of packets sent: " + temp_pubcounter + ": " + packet.packet.getClass().getSimpleName());
 //        PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet.packet), PacketCapture.LogCategory.SERVERBOUND_OUT);
-        socket.emit("publish", connectionID, packet.username + "&", // + PacketSender.get_UniqueId(packet.packet),
+        socket.emit("publish", connectionID, packet.username + "&" + PacketWrapper.getPacketWrapper(packet.packet).unique_id, // + PacketSender.get_UniqueId(packet.packet),
                 x, y, radius, json, packet.channel); // TODO: Check the packet.username and if it is necessary
     }
 
