@@ -36,7 +36,8 @@ public class ServerMultiBlockChangePacketBehaviour implements Behaviour<Packet> 
         if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
             spsPacket = new SPSPacket(packet, "clientBound", (int) sum[0]/blockRecords.length, (int) sum[2]/blockRecords.length, 0, "clientBound");
         } else {
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) sum[0]/blockRecords.length, (int) sum[2]/blockRecords.length, 0, emulatedClientConnection.getUsername());
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
         }
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

@@ -42,7 +42,8 @@ public class ServerChunkDataPacketBehaviour implements Behaviour<Packet> {
         int x = (int) emulatedClientConnection.getXPosition();
         int z = (int) emulatedClientConnection.getZPosition();
 
-        SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), x, z, 0, emulatedClientConnection.getUsername());
+//        SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), x, z, 0, emulatedClientConnection.getUsername());
+        SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername()); // This is player spicific
 //        SPSPacket spsPacket = new SPSPacket(packet, "clientBound", x, z, 500);
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

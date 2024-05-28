@@ -10,6 +10,7 @@ import org.koekepan.VAST.Packet.SPSPacket;
 
 public class ServerEntityVelocityPacketBehaviour implements Behaviour<Packet> {
     private EmulatedClientConnection emulatedClientConnection;
+    private boolean retry = true;
 //    private IServerSession serverSession;
 
     private ServerEntityVelocityPacketBehaviour() {
@@ -36,16 +37,19 @@ public class ServerEntityVelocityPacketBehaviour implements Behaviour<Packet> {
             x = EntityTracker.getXByEntityId(entityId);
             z = EntityTracker.getZByEntityId(entityId);
         } else {
-//            throw new RuntimeException("No entity found with Entity Id: " + entityId);
-
-            // TODO: To fix this, make it player specific, I.e. post this packet at the player position
-            // TODO: This happens when player throws item - is quite possibly the reason for the metadata issue aswell!
-            // TODO: Check how thrown items or items on the ground is supposed to be spawned, I think it is spawned with a metadata data packet, but the
-            // issue with the metadata packet is that the entity does not yet exist.
-
-            System.out.println("ServerEntityVelocityPacketBehaviour::process => (ERROR) No entity found with Entity Id: " + entityId);
-            emulatedClientConnection.getPacketSender().removePacket(packet);
-
+            if (retry) {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(20);
+                        process(packet);
+                        retry = false;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            } else {
+                System.out.println("ServerEntityVelocityPacketBehaviour::process => Error: Entity not found for packet: " + packet.getClass().getSimpleName() + " Entity Id: " + serverEntityVelocityPacket.getEntityId());
+            }
             return;
         }
 
@@ -54,7 +58,8 @@ public class ServerEntityVelocityPacketBehaviour implements Behaviour<Packet> {
         if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
             spsPacket = new SPSPacket(packet, "clientBound", (int) x, (int) z, 0, "clientBound");
         } else {
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) x, (int) z, 0, emulatedClientConnection.getUsername());
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
         }
 //        SPSPacket spsPacket = new SPSPacket(packet, proxySession.getUsername(), (int) x, (int) z, 0);
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);

@@ -152,6 +152,7 @@ public class VastConnection {
                         EstablishConnectionPacket establishConnectionPacket = (EstablishConnectionPacket) packet.packet;
 
                         if (establishConnectionPacket.establishConnection()) {
+                            System.out.println("VastConnection.java => (INFO) Received establish connection packet from VAST_COM");
                             App.connectNewEmulatedClient(establishConnectionPacket.getUsername());
 //                            packetWrapperMap.remove(packet.packet);
 //                            return;

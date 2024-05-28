@@ -10,6 +10,7 @@ import org.koekepan.VAST.Packet.SPSPacket;
 
 public class ServerEntitySetPassengersPacketBehaviour implements Behaviour<Packet> {
     private EmulatedClientConnection emulatedClientConnection;
+    private boolean retry = true;
 //    private IServerSession serverSession;
 
     private ServerEntitySetPassengersPacketBehaviour() {
@@ -39,9 +40,19 @@ public class ServerEntitySetPassengersPacketBehaviour implements Behaviour<Packe
             y = (int) EmulatedClientConnection.getYByEntityId(serverEntitySetPassengersPacket.getEntityId());
             z = (int) EmulatedClientConnection.getZByEntityId(serverEntitySetPassengersPacket.getEntityId());
         } else {
-            System.out.println("ServerEntitySetPassengersPacketBehaviour::process => (ERROR) No entity found with Entity Id: " + serverEntitySetPassengersPacket.getEntityId());
-            emulatedClientConnection.getPacketSender().removePacket(packet);
-//            Logger.log(this, Logger.Level.ERROR, new String[]{"Entity", "setPassengers", "behaviour"}, "Entity not found: " + serverEntitySetPassengersPacket.getEntityId());
+            if (retry) {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(20);
+                        process(packet);
+                        retry = false;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            } else {
+                System.out.println("ServerEntitySetPassengersPacketBehaviour::process => Error: Entity not found for packet: " + packet.getClass().getSimpleName() + " Entity Id: " + serverEntitySetPassengersPacket.getEntityId());
+            }
             return;
         }
 
@@ -49,7 +60,8 @@ public class ServerEntitySetPassengersPacketBehaviour implements Behaviour<Packe
         if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
             spsPacket = new SPSPacket(packet, "clientBound", x, z, 0, "clientBound");
         } else {
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) x, (int) z, 0, emulatedClientConnection.getUsername());
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
         }
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

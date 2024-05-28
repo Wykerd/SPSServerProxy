@@ -38,6 +38,10 @@ public class ServerSpawnMobPacketBehaviour implements Behaviour<Packet> {
         if (!EmulatedClientConnection.isPlayer(entityId)){
             if (EntityTracker.getEntityTrackerByEntityId(entityId) == null) {
                 new EntityTracker(x, y, z, entityId, uuid);
+//                System.out.println("Spawning Mob with entityID: " + entityId);
+            } else {
+//                System.out.println("Mob already exists!");
+                EntityTracker.moveByEntityId(entityId, x, y, z, (byte) 0);
             }
         }
 
@@ -46,7 +50,8 @@ public class ServerSpawnMobPacketBehaviour implements Behaviour<Packet> {
         if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
             spsPacket = new SPSPacket(packet, "clientBound", (int) x, (int) z, 0, "clientBound");
         } else {
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) x, (int) z, 0, emulatedClientConnection.getUsername());
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
         }
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

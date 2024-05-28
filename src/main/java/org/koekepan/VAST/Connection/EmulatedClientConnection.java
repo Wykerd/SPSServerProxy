@@ -41,7 +41,6 @@ public class EmulatedClientConnection {
         this.connected = false;
 
         this.packetSender.setClientSession(this.session);
-        this.packetSender.startClientSender();
 
         this.session.addListener(new SessionAdapter() {
             @Override
@@ -147,6 +146,9 @@ public class EmulatedClientConnection {
     }
 
     public void movePlayer(double x, double y, double z, boolean isRelative) {
+//        this.x_position = 0;
+//        this.y_position = 0;
+
         if (isRelative) {
             this.x_position += x;
             this.y_position += y;

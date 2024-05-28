@@ -44,8 +44,10 @@ public class ServerSpawnObjectPacketBehaviour implements Behaviour<Packet> {
         SPSPacket spsPacket;
         if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
             spsPacket = new SPSPacket(packet, "Herobrine", (int) x, (int) z, 0, "clientBound");
-        } else {
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) x, (int) z, 0, emulatedClientConnection.getUsername());
+        } else { // Player Specific Packet
+//            System.out.println("ServerSpawnObjectPacketBehaviour::process => " + emulatedClientConnection.getUsername() + " is spawning object at: " + x + ", " + y + ", " + z);
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
         }
 
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

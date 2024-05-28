@@ -37,7 +37,7 @@ public class ServerLoginSuccessPacketBehaviour implements Behaviour<Packet> {
 //			throw new RuntimeException(e);
 //		}
 
-		SPSPacket spsPacket = new SPSPacket(packet, loginSuccessPacket.getProfile().getName(), 500, 500, 2000, "clientBound"); // TODO: should be published either globally or to a new channel just for login?
+		SPSPacket spsPacket = new SPSPacket(packet, loginSuccessPacket.getProfile().getName(), 1, 1, 2000, "clientBound"); // TODO: should be published either globally or to a new channel just for login?
 //		emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
 		PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
 		PacketWrapper.setProcessed(packet, true);

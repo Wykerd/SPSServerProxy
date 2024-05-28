@@ -71,9 +71,9 @@ public class App
         EmulatedClientConnection emulatedClientConnection = new EmulatedClientConnection(minecraftHost, minecraftPort, "ProxyListener2");
         emulatedClientConnection.setPacketHandler(new PacketHandler(emulatedClientConnection));
 
-        emulatedClientConnection.getPacketSender().setServerSenderUsername("ProxyListener2");
-
         emulatedClientConnection.connect();
+        emulatedClientConnection.getPacketSender().startClientSender();
+        emulatedClientConnection.getPacketSender().setServerSenderUsername("ProxyListener2");
     }
 
     public static void connectNewEmulatedClient(String username) {
@@ -82,9 +82,12 @@ public class App
 
         emulatedClientInstances.put(emulatedClientConnection.getSession(), emulatedClientConnection);
         emulatedClientInstancesByUsername.put(username, emulatedClientConnection);
-        emulatedClientConnection.getPacketSender().setServerSenderUsername(username);
 
         emulatedClientConnection.connect();
+
+        emulatedClientConnection.getPacketSender().startClientSender();
+        emulatedClientConnection.getPacketSender().setServerSenderUsername(username);
+
         emulatedClientConnection.getPacketSender().startServerSender();
     }
 

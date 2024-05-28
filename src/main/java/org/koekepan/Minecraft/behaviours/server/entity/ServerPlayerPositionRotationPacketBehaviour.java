@@ -30,9 +30,11 @@ public class ServerPlayerPositionRotationPacketBehaviour implements Behaviour<Pa
 
         String username = emulatedClientConnection.getUsername();
 
+        emulatedClientConnection.movePlayer(x, y, z, false);
+
 //        emulatedClientConnection.movePlayer(x, y, z, false);
 
-        SPSPacket spsPacket = new SPSPacket(packet, username, (int) x, (int) z, 0, username); // Player specific
+        SPSPacket spsPacket = new SPSPacket(packet, username, (int) 0, (int) 0, 0, username); // Player specific
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
         PacketWrapper.setProcessed(packet, true);

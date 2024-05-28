@@ -10,6 +10,7 @@ import org.koekepan.VAST.Packet.SPSPacket;
 
 public class ServerEntityStatusPacketBehaviour implements Behaviour<Packet> {
     private EmulatedClientConnection emulatedClientConnection;
+    private boolean retry = true;
 //    private IServerSession serverSession;
 
     private ServerEntityStatusPacketBehaviour() {
@@ -38,16 +39,19 @@ public class ServerEntityStatusPacketBehaviour implements Behaviour<Packet> {
             x = EntityTracker.getXByEntityId(entityId);
             z = EntityTracker.getZByEntityId(entityId);
         } else {
-            System.out.println("ServerEntityStatusPacketBehaviour::process => (ERROR) No entity found with Entity Id: " + entityId);
-
-            SPSPacket spsPacket;
-            if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
-                spsPacket = new SPSPacket(packet, "clientBound", 100, 100, 10000, "clientBound");
+            if (retry) {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(20);
+                        process(packet);
+                        retry = false;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             } else {
-                spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) 100, (int) 100, 10000, emulatedClientConnection.getUsername());
+                System.out.println("ServerEntityStatusPacketBehaviour::process => Error: Entity not found for packet: " + packet.getClass().getSimpleName() + " Entity Id: " + serverEntityStatusPacket.getEntityId());
             }
-            PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
-            PacketWrapper.setProcessed(packet, true);
             return;
         }
 
@@ -56,7 +60,8 @@ public class ServerEntityStatusPacketBehaviour implements Behaviour<Packet> {
         if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
             spsPacket = new SPSPacket(packet, "clientBound", (int) x, (int) z, 0, "clientBound");
         } else {
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) x, (int) z, 0, emulatedClientConnection.getUsername());
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
         }
 //        SPSPacket spsPacket = new SPSPacket(packet, proxySession.getUsername(), (int) x, (int) z, 0);
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);

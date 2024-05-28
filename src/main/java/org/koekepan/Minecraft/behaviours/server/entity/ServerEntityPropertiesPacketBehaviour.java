@@ -10,6 +10,7 @@ import org.koekepan.VAST.Packet.SPSPacket;
 
 public class ServerEntityPropertiesPacketBehaviour implements Behaviour<Packet> {
     private EmulatedClientConnection emulatedClientConnection;
+    private boolean retry = true;
 //    private IServerSession serverSession;
 
     private ServerEntityPropertiesPacketBehaviour() {
@@ -38,17 +39,23 @@ public class ServerEntityPropertiesPacketBehaviour implements Behaviour<Packet> 
             y = (int) EmulatedClientConnection.getYByEntityId(serverEntityPropertiesPacket.getEntityId());
             z = (int) EmulatedClientConnection.getZByEntityId(serverEntityPropertiesPacket.getEntityId());
         } else {
-            System.out.println("ServerEntityPropertiesPacketBehaviour::process => (ERROR) No entity found with Entity Id: " + serverEntityPropertiesPacket.getEntityId());
-//            PacketSender.removePacketFromQueue(packet);
-            SPSPacket spsPacket;
-            if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
-                spsPacket = new SPSPacket(packet, "clientBound", 100, 100, 10000, "clientBound"); // Todo: Fix this!
-            } else {
-                spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) 100, (int) 100, 10000, emulatedClientConnection.getUsername());
+            if (retry) {
+                long startTime = System.currentTimeMillis();
+                while (!EntityTracker.isEntity(serverEntityPropertiesPacket.getEntityId()) && System.currentTimeMillis() - startTime < 200) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (EntityTracker.isEntity(serverEntityPropertiesPacket.getEntityId())) {
+                    process(packet);
+                    return;
+                } else {
+                    System.out.println("ServerEntityPropertiesPacketBehaviour::process => Error: Entity not found for packet: " + packet.getClass().getSimpleName() + " Entity Id: " + serverEntityPropertiesPacket.getEntityId());
+                }
+                emulatedClientConnection.getPacketSender().removePacket(packet);
             }
-//            emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
-            PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
-            PacketWrapper.setProcessed(packet, true);
             return;
         }
 
@@ -57,7 +64,8 @@ public class ServerEntityPropertiesPacketBehaviour implements Behaviour<Packet> 
         if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
             spsPacket = new SPSPacket(packet, "clientBound", x, z, 0, "clientBound");
         } else {
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) x, (int) z, 0, emulatedClientConnection.getUsername());
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
         }
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

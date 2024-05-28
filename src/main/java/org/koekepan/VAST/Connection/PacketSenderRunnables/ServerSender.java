@@ -51,6 +51,11 @@ public class ServerSender implements Runnable{
                             try {
                                 assert spsPacket2 != null;
                                 vastConnection.publish(spsPacket2);
+                                if (spsPacket2.packet.getClass().getSimpleName().equals("ServerPlayerPositionRotationPacket")) {
+                                    System.out.println("Sleeping for a second");
+                                    Thread.sleep(250);
+                                    System.out.println("Waking up");
+                                }
                             } catch (Exception e) {
                                 System.out.println("Error publishing packet: <" + wrapper.getPacket().getClass().getSimpleName() + ">: " + e.getMessage());
                                 packetSender.removePacket(wrapper.getPacket());
@@ -82,12 +87,13 @@ public class ServerSender implements Runnable{
 
                             if (wrapper != null) {
                                 try {
-//                                    if (!(username.equals("ProxyListener2"))){
+                                    if (!(wrapper.getPacket().getClass().getSimpleName().equals("ServerChunkDataPacket"))) {
                                         System.out.println("ServerSender.run: <TIMED OUT> (clientbound) Wrapper is: " + wrapper.getPacket().getClass().getSimpleName() + " and isProcessed: " + wrapper.isProcessed);
-//                                    }
-                                    packetSender.removePacket(wrapper.getPacket());
-                                    queueNumberClientBound++;
-                                    timeAdded = currentTime; // Reset time after handling timeouts
+//
+                                        packetSender.removePacket(wrapper.getPacket());
+                                        queueNumberClientBound++;
+                                        timeAdded = currentTime; // Reset time after handling timeouts
+                                    }
                                 } catch (Exception e) {
                                     System.out.println("Error removing packet: " + e.getMessage());
                                 }

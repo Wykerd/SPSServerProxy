@@ -36,8 +36,8 @@ public class ServerJoinGamePacketBehaviour implements Behaviour<Packet> {
 //		double x = PlayerTracker.getXByUsername(proxySession.getUsername());
 //		double z = PlayerTracker.getZByUsername(proxySession.getUsername());
 
-		double x = 0;
-		double z = 0;
+		double x = 2;
+		double z = 2;
 
 
 		SPSPacket spsPacket = new SPSPacket(packet, "Herobrine", (int)x, (int)z, 10000, emulatedClientConnection.getUsername()); // TODO: This should be Player specific, part of login process

@@ -25,27 +25,28 @@ public class ForwardPacketBehaviour implements Behaviour<Packet> {
 	
 	@Override
 	public void process(Packet packet) {
-		if (toServer) {
-		} else {
-			if (!(this.emulatedClientConnection.getUsername().equals("ProxyListener2"))) {
+        if (!toServer) {
+            if (!(this.emulatedClientConnection.getUsername().equals("ProxyListener2"))) {
 
-				if (packet.getClass().getSimpleName().equals("LoginSetCompressionPacket")) { //TODO: This should be Player specific, part of login process
+                if (packet.getClass().getSimpleName().equals("LoginSetCompressionPacket")) { //TODO: This should be Player specific, part of login process
 //					ConsoleIO.println("ForwardPacketBehaviour.process: " + packet.getClass().getSimpleName());
-					emulatedClientConnection.getPacketSender().removePacket(packet);
-					return;
-				}
+                    emulatedClientConnection.getPacketSender().removePacket(packet);
+                    return;
+                }
 
-				SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
-				PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
-			} else {
-				if (packet.getClass().getSimpleName().equals("ServerKeepAlivePacket")){
-					emulatedClientConnection.getPacketSender().removePacket(packet);
-					return;
-				}
-			}
-		}
+//                SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+                SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
+                PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
+            } else {
+                if (packet.getClass().getSimpleName().equals("ServerKeepAlivePacket")){
+                    emulatedClientConnection.getPacketSender().removePacket(packet);
+                    return;
+                }
+                System.out.println("ForwardPacketBehaviour.process: Cant create SPS packet for " + packet.getClass().getSimpleName());
+            }
+        }
 
-		try {
+        try {
 			PacketWrapper.setProcessed(packet, true);
 		} catch (Exception e) {
 			System.out.println("ForwardPacketBehaviour for packet: <" + packet.getClass().getSimpleName() + "> failed setting processed: <" + e.getMessage() + ">");

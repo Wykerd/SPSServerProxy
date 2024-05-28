@@ -30,7 +30,7 @@ public class PacketHandler {
         this.setBehaviours(behaviourHandler);
 
         // Initialize the thread pool with a fixed size. Adjust size based on your application's requirements and hardware capabilities.
-        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()); // TODO: Do this in spsclientproxy as well.
+        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     public void addPacket(PacketWrapper packetWrapper) {
