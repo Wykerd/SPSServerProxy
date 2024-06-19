@@ -49,7 +49,8 @@ public class ServerSpawnPlayerPacketBehaviour implements Behaviour<Packet> {
             spsPacket = new SPSPacket(packet, "clientBound", (int) x, (int) z, 0, "clientBound");
         } else {
 //            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) x, (int) z, 0, "clientBound");
         }
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

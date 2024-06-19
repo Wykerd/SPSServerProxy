@@ -1,5 +1,7 @@
 package org.koekepan.VAST.Connection;
 
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityDestroyPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 import com.google.gson.Gson;
 import io.socket.client.IO;
@@ -23,6 +25,7 @@ import org.koekepan.VAST.Packet.PacketWrapper;
 import org.koekepan.VAST.Packet.SPSPacket;
 
 import static java.lang.Thread.sleep;
+import static org.koekepan.App.config;
 import static org.koekepan.VAST.Packet.PacketUtil.*;
 import static org.koekepan.VAST.Packet.PacketWrapper.packetWrapperMap;
 
@@ -31,6 +34,9 @@ public class VastConnection {
     private final int VAST_COM_PORT;
     private final String VAST_COM_IP;
     private final UUID uuid = UUID.randomUUID();
+
+    private int VAST_CLIENT_X_Position;
+    private int VAST_CLIENT_Y_Position;
 
     private Socket socket;
 //    private ClientConnectedInstance clientInstance;
@@ -98,10 +104,16 @@ public class VastConnection {
     }
 
     private void initialiseVASTclient() { // TODO: This subscribe should be more client-specific: (This is just for the login procedure)
-        socket.emit("spawn_VASTclient", "Minecraft Client 1", "10.42.0.1", "20000", "100", "100");
+
+        String gatewayMatcherHost = config.getGateWayMatcherHost();
+        int gatewayMatcherPort = config.getGateWayMatcherPort();
+
+        this.VAST_CLIENT_X_Position = config.getServerClientXPosition();
+        this.VAST_CLIENT_Y_Position = config.getServerClientYPosition();
+        socket.emit("spawn_VASTclient", "SC 1", gatewayMatcherHost, Integer.toString(gatewayMatcherPort), this.VAST_CLIENT_X_Position, VAST_CLIENT_Y_Position);
 
         try {
-            sleep(100);
+            sleep(300);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -150,14 +162,63 @@ public class VastConnection {
                         // Create an EmulatedClientConnection to Server
 
                         EstablishConnectionPacket establishConnectionPacket = (EstablishConnectionPacket) packet.packet;
+                        username = establishConnectionPacket.getUsername();
+
+//                        System.out.println("VastConnection.java => (INFO) Received establish connection packet with details: "+establishConnectionPacket.toString());
 
                         if (establishConnectionPacket.establishConnection()) {
-                            System.out.println("VastConnection.java => (INFO) Received establish connection packet from VAST_COM");
-                            App.connectNewEmulatedClient(establishConnectionPacket.getUsername());
+
+                            if (establishConnectionPacket.getIp() != null) {
+                                if (Objects.equals(establishConnectionPacket.getIp(), App.getMinecraftHost()) && establishConnectionPacket.getPort() == App.getMinecraftPort()) {
+                                    System.out.println("VastConnection.java => (INFO) Received establish connection packet from VAST_COM with correct IP and Port");
+
+                                    if (!App.emulatedClientInstancesByUsername.containsKey(username)) {
+                                        App.connectNewEmulatedClient(establishConnectionPacket.getUsername());
+                                        App.emulatedClientInstancesByUsername.get(username).setMigratingIn(true);
+                                    } else {
+                                        App.emulatedClientInstancesByUsername.get(username).disconnect();
+                                        App.connectNewEmulatedClient(establishConnectionPacket.getUsername());
+                                        App.emulatedClientInstancesByUsername.get(username).setMigratingIn(true);
+                                    }
+
+                                } else {
+                                    System.out.println("VastConnection.java => (ERROR) Received establish connection packet from VAST_COM with incorrect IP and Port");
+//                                    System.out.println("VastConnection.java => (ERROR) Expected IP: "+App.getMinecraftHost()+" Port: "+App.getMinecraftPort());
+//                                    System.out.println("VastConnection.java => (ERROR) Received IP: "+establishConnectionPacket.getIp()+" Port: "+establishConnectionPacket.getPort());
+                                    return;
+                                }
+                            } else {
+                                System.out.println("VastConnection.java => (INFO) Received establish connection packet from VAST_COM");
+                                App.connectNewEmulatedClient(establishConnectionPacket.getUsername());
+                            }
 //                            packetWrapperMap.remove(packet.packet);
 //                            return;
                         } else {
-                            App.emulatedClientInstancesByUsername.get(username).disconnect();
+                            System.out.println("received disconnect packet");
+
+                            if (establishConnectionPacket.getIp() != null){
+                                if (Objects.equals(establishConnectionPacket.getIp(), App.getMinecraftHost()) && establishConnectionPacket.getPort() == App.getMinecraftPort()) {
+                                    System.out.println("VastConnection.java => (INFO) Disconnected User: <" + establishConnectionPacket.getUsername() + "> from VAST_COM with correct IP and Port");
+                                    if (App.emulatedClientInstancesByUsername.containsKey(username)) {
+                                        App.emulatedClientInstancesByUsername.get(username).disconnect();
+                                    } else {
+                                        System.out.println("VastConnection.java => (ERROR) Received disconnect packet from VAST_COM with correct IP and Port but user not found in emulatedClientInstancesByUsername");
+                                        System.out.println("VastConnection.java => (ERROR) The users that are connected are: "+App.emulatedClientInstancesByUsername.keySet());
+                                        System.out.println("VastConnection.java => (ERROR) The user that disconnected is: <"+username+ ">");
+//                                        System.out.println("VastConnection.java => (ERROR) The if statement is : "+App.emulatedClientInstancesByUsername.containsKey(username));
+                                    }
+//                                    App.emulatedClientInstancesByUsername.get(username).disconnect();
+                                    return;
+                                } else {
+                                    System.out.println("VastConnection.java => (ERROR) Received disconnect connection packet from VAST_COM with incorrect IP and Port");
+                                    System.out.println("VastConnection.java => (ERROR) Expected IP: "+App.getMinecraftHost()+" Port: "+App.getMinecraftPort());
+                                    System.out.println("VastConnection.java => (ERROR) Received IP: "+establishConnectionPacket.getIp()+" Port: "+establishConnectionPacket.getPort());
+                                }
+                            } else {
+                                System.out.println("VastConnection.java => (INFO) Disconnected User: " + establishConnectionPacket.getUsername() + " from VAST_COM");
+                                App.emulatedClientInstancesByUsername.get(username).disconnect();
+                                return;
+                            }
 //                            packetWrapperMap.remove(packet.packet);
 //                            return;
                         }
@@ -233,6 +294,11 @@ public class VastConnection {
 
     public void publish(SPSPacket packet) { // sends to vast matcher as client
 
+//        if (packet.packet.getClass().getSimpleName().equals("ServerEntityDestroyPacket")) {
+//            System.out.println("VastConnection.java => (INFO) Received ServerEntityDestroyPacket");
+//            return;
+//        }
+
 //        System.out.println("Connection <"+uuid+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
 
         //convert to JSON
@@ -260,5 +326,13 @@ public class VastConnection {
         int x_position = x;
         int z_position = y;
         socket.emit("move", x_position, z_position);
+    }
+
+    public int getVAST_CLIENT_X_Position() {
+        return VAST_CLIENT_X_Position;
+    }
+
+    public int getVAST_CLIENT_Y_Position() {
+        return VAST_CLIENT_Y_Position;
     }
 }

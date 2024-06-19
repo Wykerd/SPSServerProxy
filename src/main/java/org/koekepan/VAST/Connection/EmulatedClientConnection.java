@@ -1,19 +1,29 @@
 package org.koekepan.VAST.Connection;
 
 import com.github.steveice10.mc.protocol.MinecraftProtocol;
+import com.github.steveice10.mc.protocol.packet.ingame.client.ClientPluginMessagePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.ServerPluginMessagePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import com.github.steveice10.packetlib.Client;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.event.session.SessionAdapter;
 import com.github.steveice10.packetlib.packet.Packet;
 import com.github.steveice10.packetlib.tcp.TcpSessionFactory;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.koekepan.App;
 import org.koekepan.VAST.Packet.PacketHandler;
 import org.koekepan.VAST.Packet.PacketWrapper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import static org.koekepan.App.emulatedClientInstances;
+import static org.koekepan.VAST.Packet.PacketWrapper.packetWrapperMap;
 
 
 public class EmulatedClientConnection {
@@ -32,6 +42,9 @@ public class EmulatedClientConnection {
 
     private final PacketSender packetSender = new PacketSender();
     public static HashSet<Integer> playerEntityIds = new HashSet<>(); // This is a set of entityIds that are players
+    private boolean MigratingIn = false;
+
+    private int tempCounter = 0;
 
     public EmulatedClientConnection(String Host, int Port, String username) {
         this.username = username;
@@ -46,12 +59,73 @@ public class EmulatedClientConnection {
             @Override
             public void packetReceived(com.github.steveice10.packetlib.event.session.PacketReceivedEvent event) { // Receive Packet from server
 
+//                if (this.is)
+
+//                EmulatedClientConnection emulatedClientConnection = getClientInstanceByUsername(username);
+//                if (emulatedClientConnection != null) {
+//                    if (emulatedClientConnection.isMigratingIn()
+//                            && !(event.getPacket() instanceof ServerPluginMessagePacket)
+//                            && !(event.getPacket() instanceof ServerJoinGamePacket)
+//                            && !(event.getPacket() instanceof ServerPlayerPositionRotationPacket)
+//                    ) {
+//                        System.out.println("Migrating: <" + emulatedClientConnection.isMigratingIn() + "> username: " + username);
+//                        if (event.getPacket() instanceof ServerJoinGamePacket) {
+//                            emulatedClientConnection.setMigratingIn(false); //Migrated
+//                        }
+//                        if (event.getPacket() instanceof ServerPlayerPositionRotationPacket) {
+//                            System.out.println("<" + username + "> Received player position rotation packet from server");
+//
+//                            ServerPlayerPositionRotationPacket p = event.getPacket();
+//                            ClientPlayerPositionRotationPacket responsePacket = new ClientPlayerPositionRotationPacket(
+//                                    true,
+//                                    p.getX(),
+//                                    p.getY(),
+//                                    p.getZ(),
+//                                    p.getYaw(),
+//                                    p.getPitch()
+//                            );
+//
+//                            // Send reponse packet to server
+//
+//                            PacketWrapper packetWrapper = new PacketWrapper(responsePacket);
+//                            emulatedClientConnection.getPacketSender().sendPacketToServerImmediate(packetWrapper);
+////                            emulatedClientConnection.setMigratingIn(false); //Migrated
+//                            return;
+//                        }
+//
+//                        return;
+//                    } else {
+//                        System.out.println("MIGRATING!!!! <" + username + "> Received packet from server: " + event.getPacket().getClass().getSimpleName());
+//                    }
+//                } else {
+//                    System.out.println("EmulatedClientConnection::packetReceived => emulatedClientConnection is null for username: " + username);
+//                }
+
+//                if (event.getPacket() instanceof ServerChunkDataPacket) {
+//                    System.out.println("<" + username + "> Received Chunk! packet from server");
+//                }
+
+                if (event.getPacket() instanceof ServerChunkDataPacket && isMigratingIn()) {
+                    tempCounter++;
+
+                    if (tempCounter == 441) {
+                        System.out.println("Migrating: <" + isMigratingIn() + "> username: " + username);
+                        setMigratingIn(false); //Migrated
+                        tempCounter = 0;
+                    }
+                    return;
+                }
+
                 PacketWrapper packetWrapper = new PacketWrapper( (Packet) event.getPacket() );
 //                packetWrapper.setPlayerSpecific(username);
                 packetWrapper.clientBound = true;
 
                 PacketWrapper.packetWrapperMap.put(event.getPacket(), packetWrapper);
 
+                if (event.getPacket().getClass().getSimpleName().equals("ServerPluginMessagePacket")) {
+                    System.out.println("<" + username + "> Received plugin message packet from server: " + event.getPacket().getClass().getSimpleName());
+//                    return;
+                }
 //                System.out.println("<" + username + "> Received packet from server: " + event.getPacket().getClass().getSimpleName());
 
                 packetHandler.addPacket(packetWrapper);
@@ -199,4 +273,40 @@ public class EmulatedClientConnection {
     }
 
 
+    public void addChannelRegistration(String channel) {
+        byte[] payload = writeStringToPluginMessageData(channel);
+        String registerMessage = "REGISTER";
+        ClientPluginMessagePacket registerPacket = new ClientPluginMessagePacket(registerMessage, payload);
+
+
+        PacketWrapper packetWrapper = new PacketWrapper(registerPacket);
+//        packetWrapper.unique_id = unique_id;
+        packetWrapper.clientBound = false;
+//        packetWrapperMap.put(registerPacket, packetWrapper);
+        this.packetSender.sendPacketToServerImmediate(packetWrapper);
+    }
+
+    public void removeChannelRegistration(String channel) {
+        byte[] payload = writeStringToPluginMessageData(channel);
+        String unregisterMessage = "UNREGISTER";
+        ClientPluginMessagePacket unregisterPacket = new ClientPluginMessagePacket(unregisterMessage, payload);
+        PacketWrapper packetWrapper = new PacketWrapper(unregisterPacket);
+        packetWrapper.clientBound = false;
+        this.packetSender.sendPacketToServerImmediate(packetWrapper);
+    }
+
+    private byte[] writeStringToPluginMessageData(String message) {
+        byte[] data = message.getBytes(StandardCharsets.UTF_8);
+        ByteBuf buff = Unpooled.buffer();
+        buff.writeBytes(data);
+        return buff.array();
+    }
+
+    public void setMigratingIn(boolean status) {
+        this.MigratingIn = status;
+    }
+
+    public boolean isMigratingIn() {
+        return this.MigratingIn;
+    }
 }

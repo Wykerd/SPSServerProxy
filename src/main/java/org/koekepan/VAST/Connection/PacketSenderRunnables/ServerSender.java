@@ -51,6 +51,7 @@ public class ServerSender implements Runnable{
                             try {
                                 assert spsPacket2 != null;
                                 vastConnection.publish(spsPacket2);
+//                                System.out.println("ServerSender.run: <PUBLISHED> (clientbound) Wrapper is: " + wrapper.getPacket().getClass().getSimpleName() + " at x: " + spsPacket2.x + " y: " + spsPacket2.y);
                                 if (spsPacket2.packet.getClass().getSimpleName().equals("ServerPlayerPositionRotationPacket")) {
                                     System.out.println("Sleeping for a second");
                                     Thread.sleep(250);
@@ -87,13 +88,13 @@ public class ServerSender implements Runnable{
 
                             if (wrapper != null) {
                                 try {
-                                    if (!(wrapper.getPacket().getClass().getSimpleName().equals("ServerChunkDataPacket"))) {
+//                                    if (!(wrapper.getPacket().getClass().getSimpleName().equals("ServerChunkDataPacket"))) {
                                         System.out.println("ServerSender.run: <TIMED OUT> (clientbound) Wrapper is: " + wrapper.getPacket().getClass().getSimpleName() + " and isProcessed: " + wrapper.isProcessed);
 //
                                         packetSender.removePacket(wrapper.getPacket());
                                         queueNumberClientBound++;
                                         timeAdded = currentTime; // Reset time after handling timeouts
-                                    }
+//                                    }
                                 } catch (Exception e) {
                                     System.out.println("Error removing packet: " + e.getMessage());
                                 }

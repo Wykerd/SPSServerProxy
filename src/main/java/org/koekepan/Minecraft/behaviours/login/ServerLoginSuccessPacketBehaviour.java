@@ -26,19 +26,25 @@ public class ServerLoginSuccessPacketBehaviour implements Behaviour<Packet> {
 	public void process(Packet packet) {
 		LoginSuccessPacket loginSuccessPacket = (LoginSuccessPacket)packet;
 
+//		this.emulatedClientConnection.getPacketSender().removePacket(packet);
+//		return;
+
 //		Logger.log(this, Logger.Level.DEBUG, new String[]{"serverBound", "behaviour"},"ServerLoginSuccessPacketBehaviour::process => Player \""+loginSuccessPacket.getProfile().getName()+"\" has successfully logged into the server");
 
-		String username = loginSuccessPacket.getProfile().getName();
-		UUID UUID = loginSuccessPacket.getProfile().getId();
-
-//		try {
-//			new PlayerTracker(username, UUID);
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-
-		SPSPacket spsPacket = new SPSPacket(packet, loginSuccessPacket.getProfile().getName(), 1, 1, 2000, "clientBound"); // TODO: should be published either globally or to a new channel just for login?
-//		emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
+//		String username = loginSuccessPacket.getProfile().getName();
+//		UUID UUID = loginSuccessPacket.getProfile().getId();
+//
+////		try {
+////			new PlayerTracker(username, UUID);
+////		} catch (Exception e) {
+////			throw new RuntimeException(e);
+////		}
+////		SPSPacket spsPacket = new SPSPacket(packet, loginSuccessPacket.getProfile().getName(), 1, 1, 2000, "clientBound"); // TODO: should be published either globally or to a new channel just for login?
+//
+//		System.out.println("Player Username Potentially: " + loginSuccessPacket.getProfile().getName() + " or " + emulatedClientConnection.getUsername());
+//
+		SPSPacket spsPacket = new SPSPacket(packet, loginSuccessPacket.getProfile().getName(), 1, 1, 2000, this.emulatedClientConnection.getUsername()); // TODO: should be published either globally or to a new channel just for login?
+////		emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
 		PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
 		PacketWrapper.setProcessed(packet, true);
 	}

@@ -13,6 +13,12 @@ public class AppConfig {
     private String vastHost;
     private int vastPort;
 
+    private String GateWayMatcherHost;
+    private int GateWayMatcherPort;
+    int ServerClientXPosition;
+    int ServerClientYPosition;
+
+
     public AppConfig() {
         loadProperties();
     }
@@ -29,6 +35,12 @@ public class AppConfig {
             port = Integer.parseInt(prop.getProperty("MinecraftPort"));
             vastHost = prop.getProperty("VastComHost");
             vastPort = Integer.parseInt(prop.getProperty("VastComPort"));
+
+            GateWayMatcherHost = prop.getProperty("GateWayMatcherHost");
+            GateWayMatcherPort = Integer.parseInt(prop.getProperty("GateWayMatcherPort"));
+            ServerClientXPosition = Integer.parseInt(prop.getProperty("ServerVastClientXPosition"));
+            ServerClientYPosition = Integer.parseInt(prop.getProperty("ServerVastClientYPosition"));
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -49,6 +61,22 @@ public class AppConfig {
 
     public int getVastPort() {
         return vastPort;
+    }
+
+    public String getGateWayMatcherHost() {
+        return GateWayMatcherHost;
+    }
+
+    public int getGateWayMatcherPort() {
+        return GateWayMatcherPort;
+    }
+
+    public int getServerClientXPosition() {
+        return ServerClientXPosition;
+    }
+
+    public int getServerClientYPosition() {
+        return ServerClientYPosition;
     }
 
     // Main method for testing

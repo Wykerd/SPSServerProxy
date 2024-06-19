@@ -13,6 +13,7 @@ public class ClientSender implements Runnable{
         this.clientSession = clientSession;
     }
     private int queueNumberServerbound = 0;
+
     @Override
     public void run() {
         try {
@@ -32,6 +33,10 @@ public class ClientSender implements Runnable{
 
                     if (wrapper != null && wrapper.isProcessed && this.clientSession != null) {
 
+//                        if (wrapper.getPacket().getClass().getSimpleName().equals("ClientPluginMessagePacket")) {
+//                            System.out.println("ClientSender.run: <PLUGIN MESSAGE> (serverbound) Wrapper is: " + wrapper.getPacket().getClass().getSimpleName() + " and isProcessed: " + wrapper.isProcessed);
+//                            System.out.println("With Channel: " + ((com.github.steveice10.mc.protocol.packet.ingame.client.ClientPluginMessagePacket)wrapper.getPacket()).getChannel());
+//                        }
 
                         this.clientSession.send(wrapper.getPacket());
                         PacketCapture.log(wrapper.getPacket().getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(wrapper.getPacket()), PacketCapture.LogCategory.SERVERBOUND_OUT);

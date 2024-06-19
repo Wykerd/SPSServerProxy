@@ -1,7 +1,11 @@
 package org.koekepan.VAST.Connection;
 
+import com.github.steveice10.mc.protocol.packet.ingame.client.ClientPluginMessagePacket;
 import com.github.steveice10.packetlib.Session;
 import com.github.steveice10.packetlib.packet.Packet;
+//import com.github.steveice10.mc.protocol.data.game.state.State;
+//import com.github.steveice10.mc.protocol.packet.ingame.client.ClientPluginMessagePacketSerializer;
+
 //import org.koekepan.Performance.PacketCapture;
 import org.koekepan.Performance.PacketCapture;
 import org.koekepan.VAST.Connection.PacketSenderRunnables.ClientSender;
@@ -109,6 +113,25 @@ public class PacketSender { // This is the packet sender, it sends packets to th
 
     public void setServerSenderUsername(String username) { // TODO: Remove!
         clientSender.setUsername(username);
+    }
+
+    public void sendPacketToServerImmediate(PacketWrapper packetWrapper) {
+//        serverSender.sendPacketImmediately(packetWrapper);
+        if (packetWrapper != null && this.clientSession != null) {
+
+//            System.out.println("PacketSender.sendPacketToServerImmediate: " + packetWrapper.getPacket().getClass().getSimpleName());
+
+//            this.clientSession.getPacketProtocol().se
+//            this.clientSession.getPacketProtocol().registerOutgoing(State.PLAY, ClientPluginMessagePacket.class, new ClientPluginMessagePacketSerializer());
+//            this.clientSession.getPacketProtocol().registerOutgoing(0x5C, ClientPluginMessagePacket.class);
+//            this.clientSession.getPacketProtocol().register(0x5C, ClientPluginMessagePacket.class);
+//            protocol.registerOutgoing(State.PLAY, ClientPluginMessagePacket.class, new ClientPluginMessagePacketSerializer());
+
+            this.clientSession.send(packetWrapper.getPacket());
+            PacketCapture.log(packetWrapper.getPacket().getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packetWrapper.getPacket()), PacketCapture.LogCategory.SERVERBOUND_OUT);
+//            packetSender.removePacket(wrapper.getPacket());
+        }
+
     }
 
     public void removePacket(Packet packet) {
