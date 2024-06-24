@@ -13,10 +13,13 @@ import org.koekepan.VAST.Connection.VastConnection;
 import org.koekepan.VAST.Packet.PacketHandler;
 import org.koekepan.VAST.Packet.PacketWrapper;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 public class App
 {
@@ -47,6 +50,22 @@ public class App
 
         // 2. Create VAST_COM connection
         // For each client that connects to the server, create a emulatedClientConnection and add to HASHMAP clientInstances
+
+        String command = "./vast_com";
+//        vastPort = vastPort;
+        String argument = Integer.toString(vastPort);
+        ProcessBuilder processBuilder = new ProcessBuilder(command, argument, " &"); //> /dev/null 2>&1
+        // processBuilder.directory(new File("/path/to/working/directory"));
+        // Start the process in the background
+        try {
+            Process process = processBuilder.start();
+            System.out.println("VAST_com started in background with port: " + vastPort);
+            sleep(300);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         vastConnection = new VastConnection(vastHost, vastPort);
         vastConnection.connect();
