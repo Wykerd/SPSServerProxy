@@ -40,7 +40,7 @@ public class EmulatedClientConnection {
 
     private PacketHandler packetHandler;
 
-    private final PacketSender packetSender = new PacketSender();
+    private final PacketSender packetSender = new PacketSender(this);
     public static HashSet<Integer> playerEntityIds = new HashSet<>(); // This is a set of entityIds that are players
     private boolean MigratingIn = false;
 

@@ -3,7 +3,12 @@ package org.koekepan.VAST.Connection.PacketSenderRunnables;
 import com.github.steveice10.packetlib.Session;
 import org.koekepan.Performance.PacketCapture;
 import org.koekepan.VAST.Connection.PacketSender;
+import org.koekepan.VAST.CustomPackets.PINGPONG;
 import org.koekepan.VAST.Packet.PacketWrapper;
+import org.koekepan.VAST.Packet.SPSPacket;
+
+import static org.koekepan.VAST.Packet.PacketWrapper.packetWrapperMap;
+
 public class ClientSender implements Runnable{
 
     private PacketSender packetSender;
@@ -38,8 +43,38 @@ public class ClientSender implements Runnable{
 //                            System.out.println("With Channel: " + ((com.github.steveice10.mc.protocol.packet.ingame.client.ClientPluginMessagePacket)wrapper.getPacket()).getChannel());
 //                        }
 
-                        this.clientSession.send(wrapper.getPacket());
-                        PacketCapture.log(wrapper.getPacket().getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(wrapper.getPacket()), PacketCapture.LogCategory.SERVERBOUND_OUT);
+                        if (wrapper.getPacket() instanceof PINGPONG) {
+                            PINGPONG pingpong = (PINGPONG) wrapper.getPacket();
+                            if (pingpong.getType() == PINGPONG.Type.PING) {
+                                PINGPONG pong = new PINGPONG(PINGPONG.Direction.CLIENTBOUND, PINGPONG.Origin.ServerProxy, PINGPONG.Type.PONG);
+                                pong.setPingOriginServerID(pingpong.getPingOriginServerID()); // Very Important
+                                pong.setInitTime(pingpong.getInitTime()); // Very Important
+
+                                PacketWrapper packetWrapper = new PacketWrapper(pong);
+                                packetWrapper.unique_id = wrapper.unique_id;
+                                packetWrapper.clientBound = true;
+
+//                                SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
+//                                PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
+//                                packetWrapper.setSPSPacket();
+
+                                packetWrapperMap.put(pong, packetWrapper);
+
+                                // LOG
+//                                PacketCapture.log("PING_" + unique_id, PacketCapture.LogCategory.SERVERBOUND_PING_IN);
+
+
+                                // PONGING!
+                                System.out.println("VastConnection.java => (INFO) Received PING packet, sending PONG packet");
+                                this.packetSender.addClientBoundPacket(pong, packetWrapper.unique_id);
+                                this.packetSender.emulatedClientConnection.getPacketHandler().addPacket(packetWrapper);
+                            }
+                        }
+
+                        if (!(wrapper.getPacket() instanceof PINGPONG)){
+                            this.clientSession.send(wrapper.getPacket());
+                        }
+                        PacketCapture.log(this.packetSender.emulatedClientConnection.getUsername(),wrapper.getPacket().getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(wrapper.getPacket()), PacketCapture.LogCategory.SERVERBOUND_OUT);
 //                        PacketCapture.log(wrapper.getPacket().getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(wrapper.getPacket()), PacketCapture.LogCategory.CLIENTBOUND_OUT);
 //                        System.out.println("ClientSender.run: " + wrapper.getPacket().getClass().getSimpleName() + " sent to client: " + clientInstances_PacketSenders.get(this.packetSender).getUsername());
 

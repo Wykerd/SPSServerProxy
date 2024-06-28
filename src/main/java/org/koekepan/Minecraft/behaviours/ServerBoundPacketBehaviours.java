@@ -2,6 +2,7 @@ package org.koekepan.Minecraft.behaviours;
 
 import org.koekepan.Minecraft.behaviours.client.entity.ClientPlayerMovementPacketBehaviour;
 import org.koekepan.VAST.Connection.EmulatedClientConnection;
+import org.koekepan.VAST.CustomPackets.PINGPONG;
 import org.koekepan.VAST.Packet.BehaviourHandler;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.ClientChatPacket;
@@ -101,5 +102,7 @@ public class ServerBoundPacketBehaviours extends BehaviourHandler<Packet> {
 		
 		registerBehaviour(StatusQueryPacket.class, serverForwarder);
 		registerBehaviour(StatusPingPacket.class, serverForwarder);
+
+		registerBehaviour(PINGPONG.class, new PINGPONGBehaviour(emulatedClientConnection));
 	}
 }

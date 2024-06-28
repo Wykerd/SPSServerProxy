@@ -21,6 +21,7 @@ import org.koekepan.App;
 import org.koekepan.Minecraft.ChunkPosition;
 import org.koekepan.Performance.PacketCapture;
 import org.koekepan.VAST.CustomPackets.EstablishConnectionPacket;
+import org.koekepan.VAST.CustomPackets.PINGPONG;
 import org.koekepan.VAST.Packet.PacketWrapper;
 import org.koekepan.VAST.Packet.SPSPacket;
 
@@ -149,12 +150,44 @@ public class VastConnection {
                 String username = packet.username.split("&")[0];
                 String unique_id = packet.username.split("&")[1];
 
+
+                //////// PINGPONG PACKET HANDLING ////////
+                // IF PING PACKET we need to create a clientbound PONG packet, with FULLPONG
+                if (packet.packet instanceof PINGPONG) {
+                    PINGPONG pingpong = (PINGPONG) packet.packet;
+                    if (pingpong.getType() == PINGPONG.Type.PING) {
+
+//                        PINGPONG pong = new PINGPONG(PINGPONG.Direction.CLIENTBOUND, PINGPONG.Origin.ServerProxy, PINGPONG.Type.PONG);
+//                        pong.setPingOriginServerID(pingpong.getPingOriginServerID()); // Very Important
+//                        pong.setInitTime(pingpong.getInitTime()); // Very Important
+
+//                        PacketWrapper packetWrapper = new PacketWrapper(pong);
+//                        packetWrapper.unique_id = unique_id;
+//                        packetWrapper.clientBound = true;
+//                        packetWrapperMap.put(pong, packetWrapper);
+
+                        // LOG
+                        PacketCapture.log(username, "PING_" + unique_id, PacketCapture.LogCategory.SERVERBOUND_PING_IN);
+
+
+                        // PONGING!
+//                        System.out.println("VastConnection.java => (INFO) Received PING packet, sending PONG packet");
+//                        App.emulatedClientInstancesByUsername.get(username).getPacketSender().addClientBoundPacket(pong);
+//                        PacketWrapper.set_unique_id(pong, unique_id);
+//                        App.emulatedClientInstancesByUsername.get(username).getPacketHandler().addPacket(packetWrapper); // TODO: Will need to add behaviour for PINGPONG packet
+//                        return;
+                    }
+                }
+                //////////////////////////////////////////
+
+
+
                 PacketWrapper packetWrapper = new PacketWrapper(packet.packet);
                 packetWrapper.unique_id = unique_id;
                 packetWrapper.clientBound = false;
                 packetWrapperMap.put(packet.packet, packetWrapper);
 
-                PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + unique_id, PacketCapture.LogCategory.SERVERBOUND_IN);
+                PacketCapture.log(username,packet.packet.getClass().getSimpleName() + "_" + unique_id, PacketCapture.LogCategory.SERVERBOUND_IN);
 
                 if (packet.channel.equals("serverBound")) {
 
@@ -314,6 +347,27 @@ public class VastConnection {
 //        temp_pubcounter += 1;
 //        Logger.log(this, Logger.Level.DEBUG, new String[]{"counter", "clientPub"},"Amount of packets sent: " + temp_pubcounter + ": " + packet.packet.getClass().getSimpleName());
 //        PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet.packet), PacketCapture.LogCategory.SERVERBOUND_OUT);
+
+        if (packet.packet instanceof PINGPONG) {
+//            if (((PINGPONG) packet.packet).getType() == PINGPONG.Type.PING) {
+//                PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.getPacketWrapper(packet.packet).unique_id, PacketCapture.LogCategory.PING_OUT);
+//                socket.emit("publish", connectionID,
+//                        packet.username + "&" + PacketWrapper.getPacketWrapper(packet.packet).unique_id + "&PING",
+//                        x, y, radius, json, packet.channel);
+//                return;
+//            }
+            if (((PINGPONG) packet.packet).getType() == PINGPONG.Type.PONG) {
+                PacketCapture.log("PONG_" + PacketWrapper.getPacketWrapper(packet.packet).unique_id, PacketCapture.LogCategory.CLIENTBOUND_PONG_OUT);
+                socket.emit("publish", connectionID,
+                        packet.username + "&" + PacketWrapper.getPacketWrapper(packet.packet).unique_id + "&PROXYPONG",
+                        x, y, radius, json, packet.channel);
+                return;
+            } else {
+                // Print and error, this should not happen
+                System.out.println("VastConnection.java => (ERROR) PINGPONG packet type is not PING or PONG");
+            }
+        }
+
 
         PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet.packet), PacketCapture.LogCategory.CLIENTBOUND_OUT);
 

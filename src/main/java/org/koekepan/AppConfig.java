@@ -18,6 +18,8 @@ public class AppConfig {
     int ServerClientXPosition;
     int ServerClientYPosition;
 
+    private String logHostName = null;
+
 
     public AppConfig() {
         loadProperties();
@@ -41,6 +43,7 @@ public class AppConfig {
             ServerClientXPosition = Integer.parseInt(prop.getProperty("ServerVastClientXPosition"));
             ServerClientYPosition = Integer.parseInt(prop.getProperty("ServerVastClientYPosition"));
 
+            logHostName = prop.getProperty("LogHostName");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -87,5 +90,9 @@ public class AppConfig {
 //        System.out.println("Database URL: " + config.getDatabaseUrl());
 //        System.out.println("Database User: " + config.getDatabaseUser());
 //        System.out.println("Database Password: " + config.getDatabasePassword());
+    }
+
+    public String getLogHostName() {
+        return logHostName;
     }
 }

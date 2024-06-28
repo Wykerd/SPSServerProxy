@@ -28,6 +28,7 @@ import com.github.steveice10.mc.protocol.packet.status.client.StatusQueryPacket;
 import com.github.steveice10.mc.protocol.packet.status.server.StatusPongPacket;
 import com.github.steveice10.mc.protocol.packet.status.server.StatusResponsePacket;
 import org.koekepan.VAST.CustomPackets.EstablishConnectionPacket;
+import org.koekepan.VAST.CustomPackets.PINGPONG;
 
 // this class describes the packet protocol that is used by the proxy and tracks protocol state changes.
 // one instance per client or server connection.
@@ -164,6 +165,7 @@ public class PacketProtocol extends MinecraftProtocol {
         this.register(0x74, StatusPingPacket.class);
 
         this.register(0x75, EstablishConnectionPacket.class);
+        this.register(0x76, PINGPONG.class);
     }
 
 }

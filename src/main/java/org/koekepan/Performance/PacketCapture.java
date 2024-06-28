@@ -1,5 +1,7 @@
 package org.koekepan.Performance;
 
+import org.koekepan.App;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,6 +24,16 @@ public class PacketCapture {
         ADD_TO_OUTGOING_QUEUE,
         PROCESSING_START,
         UNKNOWN,
+
+//        CLIENTBOUND_PING_IN,
+//        CLIENTBOUND_PING_OUT,
+//        CLIENTBOUND_PONG_IN,
+        CLIENTBOUND_PONG_OUT,
+
+        SERVERBOUND_PING_IN,
+//        SERVERBOUND_PING_OUT,
+//        SERVERBOUND_PONG_IN,
+//        SERVERBOUND_PONG_OUT
     }
 
     // Directory where logs will be stored
@@ -52,7 +64,7 @@ public class PacketCapture {
     }
 
     // Synchronized to make it thread-safe
-    public static synchronized void log(String message, LogCategory category) {
+    private static synchronized void logs(String message, LogCategory category) {
         FileWriter fileWriter = null;
         String targetFilename = getFilenameByCategory(category);
 
@@ -91,6 +103,17 @@ public class PacketCapture {
         }
     }
 
+    public static synchronized void log(String Username, String message, LogCategory category) {
+//        message = message + ", "  + Username + ", " +  App.config.getLogHostName(); // Username is not NULL
+        message = message + ", "  + Username + ", " +  App.config.getLogHostName(); // Username is not NULL
+        log(message, category);
+    }
+
+    public static synchronized void log(String message, LogCategory category) {
+        message = message + ", NULL , " + App.config.getLogHostName(); // Username is NULL
+        logs(message, category);
+    }
+
     // Helper method to get filename based on log category
     private static String getFilenameByCategory(LogCategory category) {
         String filename = "";
@@ -125,6 +148,13 @@ public class PacketCapture {
             case UNKNOWN:
                 filename = "sp_clientbound_in_unknownRecipient_packet_log.csv";
                 break;
+            case CLIENTBOUND_PONG_OUT:
+                filename = "sp_clientbound_pong_out_packet_log.csv";
+                break;
+            case SERVERBOUND_PING_IN:
+                filename = "sp_serverbound_ping_in_packet_log.csv";
+                break;
+
         }
         return LOG_DIR + filename;
     }

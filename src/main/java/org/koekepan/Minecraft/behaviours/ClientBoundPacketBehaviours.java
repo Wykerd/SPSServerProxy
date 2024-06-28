@@ -5,6 +5,7 @@ import org.koekepan.Minecraft.behaviours.server.ServerPluginMessagePacketBehavio
 import org.koekepan.Minecraft.behaviours.server.entity.*;
 import org.koekepan.Minecraft.behaviours.server.world.*;
 import org.koekepan.VAST.Connection.EmulatedClientConnection;
+import org.koekepan.VAST.CustomPackets.PINGPONG;
 import org.koekepan.VAST.Packet.BehaviourHandler;
 import org.koekepan.Minecraft.behaviours.login.ServerLoginSuccessPacketBehaviour;
 import org.koekepan.Minecraft.behaviours.server.serverpackets.ServerDisconnectPacketBehaviour;
@@ -160,6 +161,8 @@ public class ClientBoundPacketBehaviours extends BehaviourHandler<Packet> {
 		registerBehaviour(StatusPongPacket.class, clientForwarder);
 		
 		registerBehaviour(ServerPluginMessagePacket.class, 			new ServerPluginMessagePacketBehaviour(emulatedClientConnection));
+
+		registerBehaviour(PINGPONG.class, new PINGPONGBehaviour(emulatedClientConnection));
 	}
 	
 	

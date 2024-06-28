@@ -37,7 +37,10 @@ public class PacketSender { // This is the packet sender, it sends packets to th
     private ClientSender serverSender;
     private ServerSender clientSender;
 
-    public PacketSender() {
+    public EmulatedClientConnection emulatedClientConnection;
+
+    public PacketSender(EmulatedClientConnection clientConnection) {
+        this.emulatedClientConnection = clientConnection;
     }
 
     public void start() {
@@ -98,9 +101,19 @@ public class PacketSender { // This is the packet sender, it sends packets to th
         clientboundPacketQueue.put(++queueNumberClientboundLast, packetWrapper);
         packetWrapper.queueNumber = queueNumberClientboundLast;
         packetWrapper.unique_id = "CB" + UUID.randomUUID().toString().substring(0, 4) + queueNumberClientboundLast;
-        PacketCapture.log(packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id, PacketCapture.LogCategory.CLIENTBOUND_IN);
+        PacketCapture.log(this.emulatedClientConnection.getUsername(),packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id, PacketCapture.LogCategory.CLIENTBOUND_IN);
 
 //        PacketCapture.log(packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id, PacketCapture.LogCategory.SERVERBOUND_IN);
+    }
+
+    public void addClientBoundPacket(Packet packet, String unique_id) {
+        PacketWrapper packetWrapper = PacketWrapper.getPacketWrapper(packet);
+        packetWrapper.clientBound = true;
+
+        clientboundPacketQueue.put(++queueNumberClientboundLast, packetWrapper);
+        packetWrapper.queueNumber = queueNumberClientboundLast;
+        packetWrapper.unique_id = unique_id;
+        PacketCapture.log(this.emulatedClientConnection.getUsername(),packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id, PacketCapture.LogCategory.CLIENTBOUND_IN);
     }
 
     public void setClientSession(Session session) {
@@ -128,7 +141,7 @@ public class PacketSender { // This is the packet sender, it sends packets to th
 //            protocol.registerOutgoing(State.PLAY, ClientPluginMessagePacket.class, new ClientPluginMessagePacketSerializer());
 
             this.clientSession.send(packetWrapper.getPacket());
-            PacketCapture.log(packetWrapper.getPacket().getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packetWrapper.getPacket()), PacketCapture.LogCategory.SERVERBOUND_OUT);
+            PacketCapture.log(this.emulatedClientConnection.getUsername(),packetWrapper.getPacket().getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packetWrapper.getPacket()), PacketCapture.LogCategory.SERVERBOUND_OUT);
 //            packetSender.removePacket(wrapper.getPacket());
         }
 
@@ -136,7 +149,7 @@ public class PacketSender { // This is the packet sender, it sends packets to th
 
     public void removePacket(Packet packet) {
 
-        PacketCapture.log(packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet), PacketCapture.LogCategory.DELETED_PACKETS);
+        PacketCapture.log(this.emulatedClientConnection.getUsername(), packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet), PacketCapture.LogCategory.DELETED_PACKETS);
 
         PacketWrapper packetWrapper = packetWrapperMap.get(packet);
         if (packetWrapper != null) {
