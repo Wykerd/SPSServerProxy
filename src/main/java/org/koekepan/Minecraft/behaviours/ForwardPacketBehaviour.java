@@ -37,7 +37,7 @@ public class ForwardPacketBehaviour implements Behaviour<Packet> {
 //                SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
                 SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
                 PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);
-            } else {
+            } else { // I.e. if this is the ProxyListener2
                 if (packet.getClass().getSimpleName().equals("ServerKeepAlivePacket")){
                     emulatedClientConnection.getPacketSender().removePacket(packet);
                     return;

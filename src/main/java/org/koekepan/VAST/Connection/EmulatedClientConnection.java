@@ -15,6 +15,7 @@ import com.github.steveice10.packetlib.tcp.TcpSessionFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.koekepan.App;
+import org.koekepan.Performance.PacketCapture;
 import org.koekepan.VAST.Packet.PacketHandler;
 import org.koekepan.VAST.Packet.PacketWrapper;
 
@@ -115,7 +116,6 @@ public class EmulatedClientConnection {
                     }
                     return;
                 }
-
                 PacketWrapper packetWrapper = new PacketWrapper( (Packet) event.getPacket() );
 //                packetWrapper.setPlayerSpecific(username);
                 packetWrapper.clientBound = true;
@@ -128,8 +128,10 @@ public class EmulatedClientConnection {
                 }
 //                System.out.println("<" + username + "> Received packet from server: " + event.getPacket().getClass().getSimpleName());
 
-                packetHandler.addPacket(packetWrapper);
+
                 packetSender.addClientBoundPacket(event.getPacket());
+
+                packetHandler.addPacket(packetWrapper); // Maybe below addclientboundpacket?
             }
 
             @Override

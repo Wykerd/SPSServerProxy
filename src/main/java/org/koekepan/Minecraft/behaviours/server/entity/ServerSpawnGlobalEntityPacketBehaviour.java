@@ -46,8 +46,8 @@ public class ServerSpawnGlobalEntityPacketBehaviour implements Behaviour<Packet>
         if (emulatedClientConnection.getUsername().equals("ProxyListener2")) {
             spsPacket = new SPSPacket(packet, "clientBound", (int) x, (int) z, 512, "clientBound"); // TODO: Radius is and should not be hardcoded to 512
         } else {
-//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
-            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+//            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0,0, 0, emulatedClientConnection.getUsername());
         }
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
         PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

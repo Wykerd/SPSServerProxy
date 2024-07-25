@@ -1,5 +1,8 @@
 package org.koekepan.VAST.Packet;
 
+import com.github.steveice10.packetlib.packet.Packet;
+import org.koekepan.Performance.PacketCapture;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +43,11 @@ public class BehaviourHandler<T> {
     public void process(T object) {
         Behaviour<T> behaviour = behaviours.get(object.getClass());
         if (behaviour != null) {
-            behaviour.process(object);
+            if (object != null && object instanceof Packet) {
+                behaviour.process(object);
+            } else {
+                System.out.println("Object is null or not an instance of Packet, probably because it timed out before being processed.");
+            }
         }
         else {
             System.out.println("No behaviour found for object of type: " + object.getClass().getName());

@@ -60,7 +60,7 @@ public class App
         try {
             Process process = processBuilder.start();
             System.out.println("VAST_com started in background with port: " + vastPort);
-            sleep(300);
+            sleep(300); // Sleep for 300ms to allow VAST_COM to start en connect to matcher
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {

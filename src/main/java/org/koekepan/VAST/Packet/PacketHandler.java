@@ -4,6 +4,7 @@ import com.github.steveice10.packetlib.packet.Packet;
 //import org.koekepan.VAST.Connection.ClientConnectedInstance;
 import org.koekepan.Minecraft.behaviours.ClientBoundPacketBehaviours;
 import org.koekepan.Minecraft.behaviours.ServerBoundPacketBehaviours;
+import org.koekepan.Performance.PacketCapture;
 import org.koekepan.VAST.Connection.EmulatedClientConnection;
 
 import java.util.concurrent.ExecutorService;
@@ -30,7 +31,8 @@ public class PacketHandler {
         this.setBehaviours(behaviourHandler);
 
         // Initialize the thread pool with a fixed size. Adjust size based on your application's requirements and hardware capabilities.
-        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+//        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.executorService = ExecutorServiceSingleton.getInstance();
     }
 
     public void addPacket(PacketWrapper packetWrapper) {
@@ -49,7 +51,11 @@ public class PacketHandler {
         }
         executorService.submit(() -> {
             try {
-                this.behaviourHandler.process(packet);
+                PacketCapture.log(
+                        packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id,
+                        PacketCapture.LogCategory.PROCESSING_START
+                );
+                this.behaviourHandler.process(packet); // TODO: Add an timeout??!?!?!
                 // Optionally, add callback or future to handle post-processing
             } catch (Exception e) {
                 e.printStackTrace(); // Consider a more robust error handling approach

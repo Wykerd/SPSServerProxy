@@ -37,9 +37,9 @@ public class ServerSpawnPlayerPacketBehaviour implements Behaviour<Packet> {
 
         if (!(EmulatedClientConnection.isPlayer(entityId))){
 //            PlayerTracker.setEntityId(entityId, uuid);
-            if (EntityTracker.getEntityTrackerByEntityId(entityId) == null) {
-                new EntityTracker(x, y, z, entityId, uuid);
-            }
+//            if (EntityTracker.getEntityTrackerByEntityId(entityId) == null) {
+//                new EntityTracker(x, y, z, entityId, uuid);
+//            }
         }
 
 //        Logger.log(this, Logger.Level.INFO, new String[]{"Entity", "spawnPlayer", "behaviour"}, "Spawn entity: " + entityId + " :: " + Arrays.toString(serverSpawnPlayerPacket.getMetadata()));

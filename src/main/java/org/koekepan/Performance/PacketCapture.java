@@ -23,6 +23,7 @@ public class PacketCapture {
         INIT_SEND,
         ADD_TO_OUTGOING_QUEUE,
         PROCESSING_START,
+        PROCESSED,
         UNKNOWN,
 
 //        CLIENTBOUND_PING_IN,
@@ -34,6 +35,20 @@ public class PacketCapture {
 //        SERVERBOUND_PING_OUT,
 //        SERVERBOUND_PONG_IN,
 //        SERVERBOUND_PONG_OUT
+
+        CLIENTBOUND_ENTITY_BEH,
+        TEST,
+
+
+        PROCESSING_1,
+        PROCESSING_2,
+        PROCESSING_3,
+        PROCESSING_4,
+        PROCESSING_5,
+        PROCESSING_6,
+        PROCESSING_7,
+        PROCESSING_8,
+        PROCESSING_9,
     }
 
     // Directory where logs will be stored
@@ -106,7 +121,7 @@ public class PacketCapture {
     public static synchronized void log(String Username, String message, LogCategory category) {
 //        message = message + ", "  + Username + ", " +  App.config.getLogHostName(); // Username is not NULL
         message = message + ", "  + Username + ", " +  App.config.getLogHostName(); // Username is not NULL
-        log(message, category);
+        logs(message, category);
     }
 
     public static synchronized void log(String message, LogCategory category) {
@@ -154,7 +169,42 @@ public class PacketCapture {
             case SERVERBOUND_PING_IN:
                 filename = "sp_serverbound_ping_in_packet_log.csv";
                 break;
-
+            case CLIENTBOUND_ENTITY_BEH:
+                filename = "sp_clientbound_entity_beh_packet_log.csv";
+                break;
+            case PROCESSED:
+                filename = "sp_processed_packets.csv";
+                break;
+            case TEST:
+                filename = "sp_test.csv";
+                break;
+            case PROCESSING_1:
+                filename = "sp_processing_1.csv";
+                break;
+            case PROCESSING_2:
+                filename = "sp_processing_2.csv";
+                break;
+            case PROCESSING_3:
+                filename = "sp_processing_3.csv";
+                break;
+            case PROCESSING_4:
+                filename = "sp_processing_4.csv";
+                break;
+            case PROCESSING_5:
+                filename = "sp_processing_5.csv";
+                break;
+            case PROCESSING_6:
+                filename = "sp_processing_6.csv";
+                break;
+            case PROCESSING_7:
+                filename = "sp_processing_7.csv";
+                break;
+            case PROCESSING_8:
+                filename = "sp_processing_8.csv";
+                break;
+            case PROCESSING_9:
+                filename = "sp_processing_9.csv";
+                break;
         }
         return LOG_DIR + filename;
     }

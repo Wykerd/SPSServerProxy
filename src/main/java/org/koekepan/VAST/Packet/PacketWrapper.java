@@ -1,6 +1,7 @@
 package org.koekepan.VAST.Packet;
 
 import com.github.steveice10.packetlib.packet.Packet;
+import org.koekepan.Performance.PacketCapture;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,6 +108,7 @@ public class PacketWrapper {
     public static void setProcessed(Packet packet, boolean isProcessed) {
         PacketWrapper packetWrapper = packetWrapperMap.get(packet);
         if (packetWrapper != null) {
+            PacketCapture.log(packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id, PacketCapture.LogCategory.PROCESSED);
             packetWrapper.isProcessed = isProcessed;
         } else {
             new Thread(() -> {

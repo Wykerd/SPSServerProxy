@@ -31,7 +31,7 @@ public class ServerChunkDataPacketBehaviour implements Behaviour<Packet> {
     @Override
     public void process(Packet packet) {
 
-        System.out.println("ServerChunkDataPacketBehaviour::process => ServerChunkDataPacket received");
+//        System.out.println("ServerChunkDataPacketBehaviour::process => ServerChunkDataPacket received");
 
         ServerChunkDataPacket serverChunkDataPacket = (ServerChunkDataPacket) packet;
 
@@ -87,7 +87,15 @@ public class ServerChunkDataPacketBehaviour implements Behaviour<Packet> {
 //            }
 ////            emulatedClientConnection.getPacketSender().removePacket(packet);
 //        } else {
-            SPSPacket spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0, 0, 0, emulatedClientConnection.getUsername()); // This is player spicific
+
+        SPSPacket spsPacket = null;
+        if (emulatedClientConnection.isConnected()) {
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), (int) emulatedClientConnection.getXPosition(), (int) emulatedClientConnection.getZPosition(), 0, emulatedClientConnection.getUsername());
+        } else {
+            spsPacket = new SPSPacket(packet, emulatedClientConnection.getUsername(), 0, 0, 0, emulatedClientConnection.getUsername()); // This is player spicific
+        }
+
+
 //        SPSPacket spsPacket = new SPSPacket(packet, "clientBound", x, z, 500);
 //        emulatedClientConnection.sendPacketToVASTnet_Client(spsPacket);
             PacketWrapper.getPacketWrapper(packet).setSPSPacket(spsPacket);

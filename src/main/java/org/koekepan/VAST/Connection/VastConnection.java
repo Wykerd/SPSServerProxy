@@ -4,6 +4,7 @@ import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntit
 import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import com.github.steveice10.packetlib.packet.Packet;
 import com.google.gson.Gson;
+
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -156,26 +157,8 @@ public class VastConnection {
                 if (packet.packet instanceof PINGPONG) {
                     PINGPONG pingpong = (PINGPONG) packet.packet;
                     if (pingpong.getType() == PINGPONG.Type.PING) {
-
-//                        PINGPONG pong = new PINGPONG(PINGPONG.Direction.CLIENTBOUND, PINGPONG.Origin.ServerProxy, PINGPONG.Type.PONG);
-//                        pong.setPingOriginServerID(pingpong.getPingOriginServerID()); // Very Important
-//                        pong.setInitTime(pingpong.getInitTime()); // Very Important
-
-//                        PacketWrapper packetWrapper = new PacketWrapper(pong);
-//                        packetWrapper.unique_id = unique_id;
-//                        packetWrapper.clientBound = true;
-//                        packetWrapperMap.put(pong, packetWrapper);
-
                         // LOG
                         PacketCapture.log(username, "PING_" + unique_id, PacketCapture.LogCategory.SERVERBOUND_PING_IN);
-
-
-                        // PONGING!
-//                        System.out.println("VastConnection.java => (INFO) Received PING packet, sending PONG packet");
-//                        App.emulatedClientInstancesByUsername.get(username).getPacketSender().addClientBoundPacket(pong);
-//                        PacketWrapper.set_unique_id(pong, unique_id);
-//                        App.emulatedClientInstancesByUsername.get(username).getPacketHandler().addPacket(packetWrapper); // TODO: Will need to add behaviour for PINGPONG packet
-//                        return;
                     }
                 }
                 //////////////////////////////////////////
@@ -255,7 +238,7 @@ public class VastConnection {
 //                            packetWrapperMap.remove(packet.packet);
 //                            return;
                         }
-
+//                        return;
                     }
 
                     // Can get connected client based on username of packet, I don't like this, I want to use session if possible
@@ -337,7 +320,13 @@ public class VastConnection {
         //convert to JSON
         Gson gson = new Gson();
         byte[] payload = packetToBytes(packet.packet);
-        String json = gson.toJson(payload);
+//        String json = gson.toJson(payload);
+
+//        String message = "Original byte[] size: " + payload.length + " Base64 JSON size: " + json.getBytes().length;
+//        PacketCapture.log(
+//                packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet.packet) + "_" + message,
+//                PacketCapture.LogCategory.PROCESSING_7
+//        );
         //ConsoleIO.println("Connection <"+connectionID+"> sent packet <"+packet.packet.getClass().getSimpleName()+"> on channel <"+packet.channel+">");
 
         int x = packet.x;
@@ -360,7 +349,7 @@ public class VastConnection {
                 PacketCapture.log("PONG_" + PacketWrapper.getPacketWrapper(packet.packet).unique_id, PacketCapture.LogCategory.CLIENTBOUND_PONG_OUT);
                 socket.emit("publish", connectionID,
                         packet.username + "&" + PacketWrapper.getPacketWrapper(packet.packet).unique_id + "&PROXYPONG",
-                        x, y, radius, json, packet.channel);
+                        x, y, radius, payload, packet.channel);
                 return;
             } else {
                 // Print and error, this should not happen
@@ -368,11 +357,14 @@ public class VastConnection {
             }
         }
 
-
-        PacketCapture.log(packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet.packet), PacketCapture.LogCategory.CLIENTBOUND_OUT);
+        PacketCapture.log(
+                packet.packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet.packet),
+                PacketCapture.LogCategory.CLIENTBOUND_OUT);
 
         socket.emit("publish", connectionID, packet.username + "&" + PacketWrapper.getPacketWrapper(packet.packet).unique_id, // + PacketSender.get_UniqueId(packet.packet),
-                x, y, radius, json, packet.channel); // TODO: Check the packet.username and if it is necessary
+                x, y, radius, payload, packet.channel); // TODO: Check the packet.username and if it is necessary
+
+//        socket.
     }
 
 

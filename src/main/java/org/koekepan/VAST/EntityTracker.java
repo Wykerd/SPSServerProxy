@@ -131,4 +131,13 @@ public class EntityTracker {
         this.y += y_move;
         this.z += z_move;
     }
+
+    // Function to return all tracked entities:
+    public static HashMap<Integer, EntityTracker> getEntities() {
+        return entityTrackerMapByEntityId;
+    }
+
+    public int getEntityId() {
+        return entityId;
+    }
 }

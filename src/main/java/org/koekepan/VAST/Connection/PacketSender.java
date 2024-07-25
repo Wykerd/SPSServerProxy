@@ -116,6 +116,18 @@ public class PacketSender { // This is the packet sender, it sends packets to th
         PacketCapture.log(this.emulatedClientConnection.getUsername(),packet.getClass().getSimpleName() + "_" + packetWrapper.unique_id, PacketCapture.LogCategory.CLIENTBOUND_IN);
     }
 
+
+//    addClientBoundPacket_better()
+// 1. PacketWrapper packetWrapper = PacketWrapper.getPacketWrapper(packet);
+//        packetWrapper.clientBound = true;
+//
+//        clientboundPacketQueue.put(++queueNumberClientboundLast, packetWrapper);
+//        packetWrapper.queueNumber = queueNumberClientboundLast;
+//        packetWrapper.unique_id = unique_id;
+// 2.
+
+
+
     public void setClientSession(Session session) {
         this.clientSession = session;
     }
@@ -149,7 +161,9 @@ public class PacketSender { // This is the packet sender, it sends packets to th
 
     public void removePacket(Packet packet) {
 
-        PacketCapture.log(this.emulatedClientConnection.getUsername(), packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet), PacketCapture.LogCategory.DELETED_PACKETS);
+        String CalledFrom = "This function was called from: " + Thread.currentThread().getStackTrace()[2].getClassName() + "::" + Thread.currentThread().getStackTrace()[2].getMethodName();
+
+        PacketCapture.log(this.emulatedClientConnection.getUsername(), CalledFrom + "; " + packet.getClass().getSimpleName() + "_" + PacketWrapper.get_unique_id(packet), PacketCapture.LogCategory.DELETED_PACKETS);
 
         PacketWrapper packetWrapper = packetWrapperMap.get(packet);
         if (packetWrapper != null) {
