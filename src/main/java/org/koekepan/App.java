@@ -51,7 +51,7 @@ public class App
         // 2. Create VAST_COM connection
         // For each client that connects to the server, create a emulatedClientConnection and add to HASHMAP clientInstances
 
-        String command = "./vast_com";
+        String command = "vast_com";
 //        vastPort = vastPort;
         String argument = Integer.toString(vastPort);
         ProcessBuilder processBuilder = new ProcessBuilder(command, argument, " &"); //> /dev/null 2>&1
